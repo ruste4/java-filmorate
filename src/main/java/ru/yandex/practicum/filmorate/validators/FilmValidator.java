@@ -7,20 +7,20 @@ import java.time.LocalDate;
 
 public class FilmValidator {
     public static void validate(Film film) throws ValidationException {
-        if (film.getTitle().isBlank()) {
-            throw new ValidationException("Название не может быть пустым");
+        if (film.getName().isBlank()) {
+            throw new ValidationException("name: не может быть пустым");
         }
 
         if (film.getDescription().length() > 200) {
-            throw new ValidationException("Максимальная длина описания — 200 символов");
+            throw new ValidationException("Максимальная длина description — 200 символов");
         }
 
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
+            throw new ValidationException("releaseDate: должен быть не раньше 28 декабря 1895 года");
         }
 
         if (film.getDuration().isNegative()) {
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
+            throw new ValidationException("duration: фильма должна быть положительной");
         }
     }
 }

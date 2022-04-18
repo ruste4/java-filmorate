@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class FilmController {
     };
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
+    public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
         if (films.contains(film)) {
             throw new FilmAlreadyExistException("Фильм с id:" + film.getId() + " был добавлен ранее");
         }
@@ -48,7 +49,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) throws FilmNotFoundException, ValidationException {
+    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException, ValidationException {
         if (!films.contains(film)) {
             throw new FilmNotFoundException("Фильм с id:" + film.getId() + " не найден");
         }

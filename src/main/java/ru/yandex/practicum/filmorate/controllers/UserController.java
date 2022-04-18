@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) throws UserAlreadyExistException, ValidationException {
+    public User addUser(@Valid @RequestBody User user) throws UserAlreadyExistException, ValidationException {
         if (users.contains(user)) {
             throw new UserAlreadyExistException("Пользователь с id:" + user.getId() + " добавлен ранее");
         }
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) throws UserNotFoundException, ValidationException {
+    public User updateUser(@Valid  @RequestBody User user) throws UserNotFoundException, ValidationException {
         if (!users.contains(user)) {
             throw new UserNotFoundException("Пользователь с id:" + user.getId() + " не найден");
         }

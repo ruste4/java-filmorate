@@ -7,20 +7,20 @@ import java.time.LocalDate;
 
 public class UserValidator {
     public static void validate(User user) throws ValidationException {
-        if (user.getMail().isBlank() || !user.getMail().contains("@")) {
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
+        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            throw new ValidationException("email: не может быть пустой и должна содержать символ @");
         }
 
         if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+            throw new ValidationException("login: не может быть пустым и содержать пробелы");
         }
 
-        if (user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
 
-        if (user.getBirthdate().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения не может быть в будущем");
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("birthday: не может быть в будущем");
         }
     }
 }
