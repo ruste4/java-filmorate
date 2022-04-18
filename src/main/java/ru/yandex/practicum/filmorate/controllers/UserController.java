@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RestController
+@Slf4j
 @RequestMapping("/users")
 public class UserController {
     HashSet<User> users = new HashSet<>();
@@ -40,6 +42,8 @@ public class UserController {
 
         users.add(user);
 
+        log.info("Добавлен пользователь: " + user);
+
         return user;
     }
 
@@ -53,6 +57,8 @@ public class UserController {
 
         users.remove(user);
         users.add(user);
+
+        log.info("Успешное обновление пользователя: " + user);
 
         return user;
     }

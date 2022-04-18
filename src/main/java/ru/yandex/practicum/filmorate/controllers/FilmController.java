@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RestController
+@Slf4j
 @RequestMapping("/films")
 public class FilmController {
     private HashSet<Film> films = new HashSet<>();
@@ -40,6 +42,8 @@ public class FilmController {
 
         films.add(film);
 
+        log.info("Добавлен фильм: " + film);
+
         return film;
     }
 
@@ -53,6 +57,8 @@ public class FilmController {
 
         films.remove(film);
         films.add(film);
+
+        log.info("Успешное обновление фильма: " + film);
 
         return film;
     }
