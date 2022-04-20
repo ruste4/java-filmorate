@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,7 @@ class FilmControllerTest {
     private FilmController controller;
 
     @Test
-    public void validationNameIsBlank() {
+    public void shouldBeExceptionUnderNameIsBlank() {
 
         Film film = new Film();
         film.setDescription("Description");
@@ -31,8 +30,45 @@ class FilmControllerTest {
     }
 
     @Test
-    public void maxLengthDescription200Symbols() {
+    public void shouldBeExceptionUnderDescriptionLengthMore200Symbols() {
+        Film film = new Film();
+        film.setName("Звёздный путь");
+        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации, " +
+                "конкуренты Кирк и Спок должны объединиться, чтобы не дать ему разрушить все, что им дорого. " +
+                "Во время этого будоражащего путешествия, наполненного эффектными боями, юмором и космическими " +
+                "угрозами, новоиспеченные члены команды военного корабля «Энтерпрайз» смело встретятся лицом к лицу " +
+                "с невообразимыми опасностями.");
+        film.setReleaseDate(LocalDate.parse("1967-03-25"));
+        film.setDuration(Duration.ofSeconds(100));
 
+        assertThrows(ValidationException.class, () -> {
+           controller.addFilm(film);
+        });
     }
 
+    @Test
+    public void shouldBeExceptionUnderReleaseDateBefore28December1895() {
+        Film film = new Film();
+        film.setName("Звёздный путь");
+        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
+        film.setReleaseDate(LocalDate.parse("1895-12-27"));
+        film.setDuration(Duration.ofSeconds(100));
+
+        assertThrows(ValidationException.class, () -> {
+            controller.addFilm(film);
+        });
+    }
+
+    @Test
+    public void shouldBeExceptionUnderDurationIsNegative() {
+        Film film = new Film();
+        film.setName("Звёздный путь");
+        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
+        film.setReleaseDate(LocalDate.parse("1967-03-25"));
+        film.setDuration(Duration.ofSeconds(-100));
+
+        assertThrows(ValidationException.class, () -> {
+            controller.addFilm(film);
+        });
+    }
 }
