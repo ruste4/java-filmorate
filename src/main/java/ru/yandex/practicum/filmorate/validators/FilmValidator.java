@@ -20,7 +20,7 @@ public class FilmValidator {
         }
 
         if (film.getDuration().isNegative()) {
-            throw new ValidationException("duration: фильма должна быть положительной");
+            throw new ValidationException("duration: должна быть положительной");
         }
     }
 }

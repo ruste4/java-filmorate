@@ -18,6 +18,7 @@ import java.util.HashMap;
 public class UserController {
     HashMap<Integer, User> users = new HashMap<>();
     int idCount = 0;
+
     @GetMapping
     public Collection<User> findAll() {
         return users.values();

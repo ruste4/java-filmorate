@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
 
@@ -24,9 +26,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> {
-            controller.addFilm(film);
-        });
+        assertThrows(ValidationException.class, () -> controller.addFilm(film));
     }
 
     @Test
@@ -41,9 +41,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> {
-           controller.addFilm(film);
-        });
+        assertThrows(ValidationException.class, () -> controller.addFilm(film));
     }
 
     @Test
@@ -54,9 +52,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1895-12-27"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> {
-            controller.addFilm(film);
-        });
+        assertThrows(ValidationException.class, () -> controller.addFilm(film));
     }
 
     @Test
@@ -67,7 +63,32 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(-100));
 
-        assertThrows(ValidationException.class, () -> {
+        assertThrows(ValidationException.class, () -> controller.addFilm(film));
+    }
+
+    @Test
+    public void shouldBeFilmNotFoundExceptionUnderFilmNotAdded() {
+        Film film = new Film();
+        film.setId(Integer.MAX_VALUE);
+        film.setName("Звёздный путь");
+        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
+        film.setReleaseDate(LocalDate.parse("1967-03-25"));
+        film.setDuration(Duration.ofSeconds(100));
+
+        assertThrows(FilmNotFoundException.class, () -> controller.updateFilm(film));
+    }
+
+    @Test
+    public void shouldBeFilmAlreadyExistExceptionUnderIsAddedSecondTime() {
+        Film film = new Film();
+        film.setId(Integer.MAX_VALUE);
+        film.setName("Звёздный крейсер «Галактика»");
+        film.setDescription("Чудом уцелев после нападения Сайлонов на колонии Кобола, гражданский колониал...");
+        film.setReleaseDate(LocalDate.parse("2004-03-16"));
+        film.setDuration(Duration.ofSeconds(100));
+
+        assertThrows(FilmAlreadyExistException.class, () -> {
+            controller.addFilm(film);
             controller.addFilm(film);
         });
     }

@@ -17,18 +17,19 @@ import java.util.*;
 public class FilmController {
     private HashMap<Integer, Film> films = new HashMap<>();
     private int idCount = 0;
+
     @GetMapping
     public Collection<Film> findAll() {
         return films.values();
     }
 
     @GetMapping("/{id}")
-    public Film findFilmById(@PathVariable long id) throws FilmNotFoundException {
+    public Film findFilmById(@PathVariable int id) throws FilmNotFoundException {
         if (films.containsKey(id)) {
             return films.get(id);
         }
         throw new FilmNotFoundException("Фильм с id:" + id + " не найден");
-    };
+    }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
