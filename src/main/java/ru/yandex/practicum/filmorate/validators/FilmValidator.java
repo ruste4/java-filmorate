@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class FilmValidator {
     public static void validate(Film film) throws ValidationException {
-        if (film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("name: не может быть пустым");
         }
 

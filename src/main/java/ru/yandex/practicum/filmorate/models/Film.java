@@ -10,15 +10,14 @@ import java.time.LocalDate;
 @Data
 public class Film {
     @NotNull
+    @EqualsAndHashCode.Exclude
     private int id;
     @NotNull
-    @EqualsAndHashCode.Exclude
     private String name;
     @NotNull
     @EqualsAndHashCode.Exclude
     private String description;
     @NotNull
-    @EqualsAndHashCode.Exclude
     private LocalDate releaseDate;
     @NotNull
     @EqualsAndHashCode.Exclude

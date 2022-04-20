@@ -9,40 +9,37 @@ import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-    private HashSet<Film> films = new HashSet<>();
-
+    private HashMap<Integer, Film> films = new HashMap<>();
+    private int idCount = 0;
     @GetMapping
-    public Set<Film> findAll() {
-        return films;
+    public Collection<Film> findAll() {
+        return films.values();
     }
 
     @GetMapping("/{id}")
-    public Film findFilmById(@PathVariable int id) throws FilmNotFoundException {
-        for (Film film : films) {
-            if (film.getId() == id) {
-                return film;
-            }
+    public Film findFilmById(@PathVariable long id) throws FilmNotFoundException {
+        if (films.containsKey(id)) {
+            return films.get(id);
         }
         throw new FilmNotFoundException("Фильм с id:" + id + " не найден");
     };
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
-        if (films.contains(film)) {
-            throw new FilmAlreadyExistException("Фильм с id:" + film.getId() + " был добавлен ранее");
+        if (films.containsValue(film)) {
+            throw new FilmAlreadyExistException(
+                    "Фильм " + film.getName() + " " + film.getReleaseDate() + " добавлен ранее"
+            );
         }
-
+        film.setId(++idCount);
         FilmValidator.validate(film);
-
-        films.add(film);
-
+        films.put(film.getId(), film);
         log.info("Добавлен фильм: " + film);
 
         return film;
@@ -50,15 +47,11 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException, ValidationException {
-        if (!films.contains(film)) {
+        if (!films.containsKey(film.getId())) {
             throw new FilmNotFoundException("Фильм с id:" + film.getId() + " не найден");
         }
-
         FilmValidator.validate(film);
-
-        films.remove(film);
-        films.add(film);
-
+        films.put(film.getId(), film);
         log.info("Успешное обновление фильма: " + film);
 
         return film;

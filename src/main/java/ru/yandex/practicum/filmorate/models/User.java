@@ -8,11 +8,10 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    @NotNull
+    @EqualsAndHashCode.Exclude
     private int id;
 
     @Email
-    @EqualsAndHashCode.Exclude
     private String email;
 
     @NotBlank
