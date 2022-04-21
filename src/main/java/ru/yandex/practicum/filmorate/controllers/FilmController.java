@@ -37,6 +37,6 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException, ValidationException {
-        return filmService.update(film);
+        return filmService.updateFilm(film);
     }
 }

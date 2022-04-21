@@ -35,12 +35,12 @@ public interface FilmService {
     Film findById(int id) throws FilmNotFoundException;
 
     /**
-     * Обновить
+     * Обновить фильм
      *
      * @param film
      * @return Возвращает обновленный фильм
      * @throws FilmNotFoundException если фильм не добалвен в хранилище
      * @throws ValidationException   если поля обекта Film не проходят валидацию
      */
-    Film update(Film film) throws FilmNotFoundException, ValidationException;
+    Film updateFilm(Film film) throws FilmNotFoundException, ValidationException;
 }

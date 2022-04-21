@@ -46,7 +46,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public Film update(Film film) throws FilmNotFoundException, ValidationException {
+    public Film updateFilm(Film film) throws FilmNotFoundException, ValidationException {
         if (!FILM_REPOSITORY.containsKey(film.getId())) {
             throw new FilmNotFoundException("Фильм с id:" + film.getId() + " не найден");
         }
