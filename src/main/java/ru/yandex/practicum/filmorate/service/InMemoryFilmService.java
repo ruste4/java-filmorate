@@ -24,7 +24,7 @@ public class InMemoryFilmService implements FilmService {
                     "Фильм " + film.getName() + " " + film.getReleaseDate() + " добавлен ранее"
             );
         }
-        film.setId(FILM_ID_HOLDER.decrementAndGet());
+        film.setId(FILM_ID_HOLDER.incrementAndGet());
         FilmValidator.validate(film);
         FILM_REPOSITORY.put(film.getId(), film);
         log.info("Добавлен фильм: " + film);

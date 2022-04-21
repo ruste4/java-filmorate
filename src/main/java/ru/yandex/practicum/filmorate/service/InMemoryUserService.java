@@ -25,7 +25,7 @@ public class InMemoryUserService implements UserService {
         if (USER_REPOSITORY.containsValue(user)) {
             throw new UserAlreadyExistException("Пользователь с email:" + user.getEmail() + " добавлен ранее");
         }
-        user.setId(USER_ID_HOLDER.decrementAndGet());
+        user.setId(USER_ID_HOLDER.incrementAndGet());
         UserValidator.validate(user);
         USER_REPOSITORY.put(user.getId(), user);
         log.info("Добавлен пользователь: " + user);
