@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.validators.FilmValidator;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -15,46 +16,27 @@ import java.util.*;
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-    private HashMap<Integer, Film> films = new HashMap<>();
-    private int idCount = 0;
+
+    @Autowired
+    FilmService filmService;
 
     @GetMapping
-    public Collection<Film> findAll() {
-        return films.values();
+    public List<Film> findAll() {
+        return filmService.findAll();
     }
 
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable int id) throws FilmNotFoundException {
-        if (films.containsKey(id)) {
-            return films.get(id);
-        }
-        throw new FilmNotFoundException("Фильм с id:" + id + " не найден");
+        return filmService.findById(id);
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
-        if (films.containsValue(film)) {
-            throw new FilmAlreadyExistException(
-                    "Фильм " + film.getName() + " " + film.getReleaseDate() + " добавлен ранее"
-            );
-        }
-        film.setId(++idCount);
-        FilmValidator.validate(film);
-        films.put(film.getId(), film);
-        log.info("Добавлен фильм: " + film);
-
-        return film;
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException, ValidationException {
-        if (!films.containsKey(film.getId())) {
-            throw new FilmNotFoundException("Фильм с id:" + film.getId() + " не найден");
-        }
-        FilmValidator.validate(film);
-        films.put(film.getId(), film);
-        log.info("Успешное обновление фильма: " + film);
-
-        return film;
+        return filmService.updateFilm(film);
     }
 }
