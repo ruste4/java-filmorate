@@ -59,4 +59,20 @@ public class UserController {
 
         return userService.addNewFriendToTheUser(Integer.parseInt(userId), Integer.parseInt(friendId));
     }
+
+    @DeleteMapping("{userId}/friends/{friendId}")
+    public User deleteToFriends(
+            @PathVariable(required = false) String userId,
+            @PathVariable(required = false) String friendId
+    ) throws UserNotFoundException {
+        if (userId == null) {
+            throw new IncorrectParameterException("userId");
+        }
+
+        if (friendId == null) {
+            throw new IncorrectParameterException("friendId");
+        }
+
+        return userService.deleteFriendToTheUser(Integer.parseInt(userId), Integer.parseInt(friendId));
+    }
 }

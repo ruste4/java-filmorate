@@ -105,7 +105,7 @@ public class UserService {
      * @param friendId id друга, которого нужно удалить из друзей пользователя
      * @throws UserNotFoundException если переданные userId или friendId не найдены
      */
-    public void deleteFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
+    public User deleteFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
         User user = storage.findById(userId);
         User friend = storage.findById(friendId);
 
@@ -113,6 +113,8 @@ public class UserService {
         friend.deleteFriend(userId);
 
         log.info("Delete User.id:" + friendId + " from the friends list at User.id:" + userId);
+
+        return user;
     }
 
     /**
