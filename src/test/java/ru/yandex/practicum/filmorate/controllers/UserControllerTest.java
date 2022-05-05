@@ -3,17 +3,20 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserControllerTest {
+
     @Autowired
     private UserController userController;
 
@@ -85,7 +88,6 @@ class UserControllerTest {
     @Test
     public void shouldBeUserAlreadyExistExceptionUnderUserIsAddedSecondTime() {
         User user = new User();
-        user.setId(Integer.MAX_VALUE);
         user.setEmail("q6lhkfe1@your-mai.xyz");
         user.setBirthday(LocalDate.parse("1992-06-12"));
         user.setLogin("LadimirPodnebesnyy518");
@@ -93,6 +95,65 @@ class UserControllerTest {
         assertThrows(UserAlreadyExistException.class, () -> {
             userController.addUser(user);
             userController.addUser(user);
+        });
+    }
+
+    @Test
+    public void shouldBeAddingFriend() {
+        User user = new User();
+        user.setEmail("vysheslavKukolevskiy589@mail.ru");
+        user.setBirthday(LocalDate.parse("1992-06-12"));
+        user.setLogin("EvgeinyaSaharova604");
+
+        User friend = new User();
+        friend.setEmail("AgrippinaGronskaya40@mail.ru");
+        friend.setBirthday(LocalDate.parse("1992-06-12"));
+        friend.setLogin("AgrippinaGronskaya40");
+
+        assertDoesNotThrow(() -> {
+            userController.addUser(user);
+            userController.addUser(friend);
+            userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend.getId()));
+        });
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByAddingFriend() {
+        assertThrows(IncorrectParameterException.class, () -> {
+           userController.addToFriends(null, "1");
+        });
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByAddingFriend() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            userController.addToFriends("1", null);
+        });
+    }
+
+    @Test
+    public void shouldBeUserNotFoundExceptionUnderUserNotAddedBefore() {
+        User friend = new User();
+        friend.setEmail("BernarKudryavtsev838@mail.ru");
+        friend.setBirthday(LocalDate.parse("1992-06-12"));
+        friend.setLogin("BernarKudryavtsev838");
+
+        assertThrows(UserNotFoundException.class, () -> {
+            int friendId = userController.addUser(friend).getId();
+            userController.addToFriends(String.valueOf(Integer.MAX_VALUE), String.valueOf(friendId));
+        });
+    }
+
+    @Test
+    public void shouldBeUserNotFoundExceptionUnderFriendNotAddedBefore() {
+        User user = new User();
+        user.setEmail("RimmaKiseleva799@mail.ru");
+        user.setBirthday(LocalDate.parse("1992-06-12"));
+        user.setLogin("RimmaKiseleva799");
+
+        assertThrows(UserNotFoundException.class, () -> {
+            int userId = userController.addUser(user).getId();
+            userController.addToFriends(String.valueOf(userId), String.valueOf(Integer.MAX_VALUE));
         });
     }
 }

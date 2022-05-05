@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -22,4 +24,17 @@ public class Film {
     @NotNull
     @EqualsAndHashCode.Exclude
     private Duration duration;
+    private Set<Integer> likes = new HashSet<>();
+
+    public void addLike(int userId) {
+        likes.add(userId);
+    }
+
+    public void deleteLike(int userId) {
+        likes.remove(userId);
+    }
+
+    public int getLikeCount() {
+        return likes.size();
+    }
 }

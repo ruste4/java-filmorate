@@ -16,18 +16,21 @@ import java.util.*;
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
+    private final FilmService filmService;
 
     @Autowired
-    FilmService filmService;
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public List<Film> findAll() {
-        return filmService.findAll();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable int id) throws FilmNotFoundException {
-        return filmService.findById(id);
+        return filmService.findFilmById(id);
     }
 
     @PostMapping

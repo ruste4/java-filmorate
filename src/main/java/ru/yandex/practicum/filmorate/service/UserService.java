@@ -25,39 +25,46 @@ public class UserService {
     }
 
     public User addUser(User user) throws UserAlreadyExistException, ValidationException {
-        storage.add(user);
-        log.info("Добавить " + user);
+        User newUser = storage.add(user);
+        log.info("Add " + user);
 
-        return user;
+        return newUser;
     }
 
     public User deleteUser(int id) throws UserNotFoundException {
         User user = storage.deleteById(id);
-        log.info("Удалить " + user);
+        log.info("Delete " + user);
 
         return user;
     }
 
     public User updateUser(User user) throws UserNotFoundException, ValidationException {
         storage.update(user);
-        log.info("Обновить User.id:" + user.getId() + " на " + user);
+        log.info("Update User.id:" + user.getId() + " on " + user);
 
         return user;
     }
 
     public List<User> getAllUsers() {
-        log.info("Получить всех пользователей");
+        log.info("Get all users");
 
         return storage.getAll();
     }
 
     public User findUserById(int id) throws UserNotFoundException {
         User user = storage.findById(id);
-        log.info("Найти User по id:" + id);
+        log.info("Find user by id:" + id);
 
         return user;
     }
 
+    /**
+     * Получить всех друзей пользователя
+     *
+     * @param id
+     * @return возвращает список друзей пользователя
+     * @throws UserNotFoundException если пользователь не найден, поиск идет по переданному id
+     */
     public List<User> getAllUsersFriendsById(int id) throws UserNotFoundException {
         User user = storage.findById(id);
         Set<Integer> allFriendsId = user.getAllFriendsId();
@@ -67,21 +74,37 @@ public class UserService {
             User friend = storage.findById(friendId);
             friends.add(friend);
         }
-        log.info("Получить всех друзей User.id:" + id);
+        log.info("Get all users friends by id:" + id);
 
         return friends;
     }
 
-    public void addNewFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
+    /**
+     * Добавить нового друга пользователю
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга, которого нужно добавить в друзья пользователю
+     * @throws UserNotFoundException если переданные userId или friendId не найдены
+     */
+    public User addNewFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
         User user = storage.findById(userId);
         User friend = storage.findById(friendId);
 
         user.addNewFriend(friendId);
         friend.addNewFriend(userId);
 
-        log.info("Добавить  User.id:" + userId + " в друзья User.id:" + friendId);
+        log.info("Add new User.id:" + friendId + "to the friends list at User.id:" + userId);
+
+        return user;
     }
 
+    /**
+     * Удалить друга у ползователя
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга, которого нужно удалить из друзей пользователя
+     * @throws UserNotFoundException если переданные userId или friendId не найдены
+     */
     public void deleteFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
         User user = storage.findById(userId);
         User friend = storage.findById(friendId);
@@ -89,9 +112,17 @@ public class UserService {
         user.deleteFriend(friendId);
         friend.deleteFriend(userId);
 
-        log.info("Удалить User.id:" + friendId + " из списка друзей User.id:" + userId);
+        log.info("Delete User.id:" + friendId + " from the friends list at User.id:" + userId);
     }
 
+    /**
+     * Получить общих друзей
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга
+     * @return возвращает набор общих друзей
+     * @throws UserNotFoundException если переданные userId или friendId не найдены
+     */
     public Set<User> getCommonFriends(int userId, int friendId) throws UserNotFoundException {
         User user = storage.findById(userId);
         User friend = storage.findById(userId);
@@ -103,7 +134,7 @@ public class UserService {
                 commonFriends.add(commonFriend);
             }
         }
-        log.info("Получить общих друзей User.id:" + userId + " c User.id:" + friendId);
+        log.info("Get common friends User.id:" + userId + " and User.id:" + friendId);
 
         return commonFriends;
     }
