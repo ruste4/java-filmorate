@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -74,5 +75,14 @@ public class UserController {
         }
 
         return userService.deleteFriendToTheUser(Integer.parseInt(userId), Integer.parseInt(friendId));
+    }
+
+    @GetMapping("{id}/friends")
+    public List<User> getUsersFriends(@PathVariable(required = false) String userId) throws UserNotFoundException {
+        if (userId == null) {
+            throw new IncorrectParameterException("userId");
+        }
+
+        return userService.getAllUsersFriendsById(Integer.parseInt(userId));
     }
 }

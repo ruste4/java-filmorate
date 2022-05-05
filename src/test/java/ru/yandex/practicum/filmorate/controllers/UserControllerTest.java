@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -189,6 +190,41 @@ class UserControllerTest {
     public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByDeleteFriend() {
         assertThrows(IncorrectParameterException.class, () -> {
             userController.addToFriends("1", null);
+        });
+    }
+
+    @Test
+    public void shouldBeGetAllUsersFriends() throws UserAlreadyExistException, ValidationException, UserNotFoundException {
+        User user = new User();
+        user.setEmail("ZaharZhuravel871@mail.ru");
+        user.setBirthday(LocalDate.parse("1992-06-12"));
+        user.setLogin("ZaharZhuravel871");
+
+        User friend1 = new User();
+        friend1.setEmail("AfanasiySekunov317@mail.ru");
+        friend1.setBirthday(LocalDate.parse("1992-06-12"));
+        friend1.setLogin("AfanasiySekunov317");
+
+        User friend2 = new User();
+        friend2.setEmail("FotiyPotapov83@mail.ru");
+        friend2.setBirthday(LocalDate.parse("1992-06-12"));
+        friend2.setLogin("FotiyPotapov83");
+
+        userController.addUser(user);
+        userController.addUser(friend1);
+        userController.addUser(friend2);
+
+        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend1.getId()));
+        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend2.getId()));
+
+        assertEquals(userController.getUsersFriends(String.valueOf(user.getId())), List.of(friend1, friend2));
+
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByGetUsersFriends() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            userController.getUsersFriends(null);
         });
     }
 
