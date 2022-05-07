@@ -194,7 +194,8 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeGetAllUsersFriends() throws UserAlreadyExistException, ValidationException, UserNotFoundException {
+    public void shouldBeGetAllUsersFriends()
+            throws UserAlreadyExistException, ValidationException, UserNotFoundException {
         User user = new User();
         user.setEmail("ZaharZhuravel871@mail.ru");
         user.setBirthday(LocalDate.parse("1992-06-12"));
@@ -228,4 +229,52 @@ class UserControllerTest {
         });
     }
 
+    @Test
+    public void shouldBeGetCommonFriends()
+            throws UserAlreadyExistException, ValidationException, UserNotFoundException {
+        User user1 = new User();
+        user1.setEmail("PankratiyNektov295@mail.ru");
+        user1.setBirthday(LocalDate.parse("1992-06-12"));
+        user1.setLogin("PankratiyNektov295");
+
+        User user2 = new User();
+        user2.setEmail("OksanaLeonova655@mail.ru");
+        user2.setBirthday(LocalDate.parse("1992-06-12"));
+        user2.setLogin("OksanaLeonova655");
+
+        User user3 = new User();
+        user3.setEmail("NinelYandutova679@mail.ru");
+        user3.setBirthday(LocalDate.parse("1992-06-12"));
+        user3.setLogin("NinelYandutova679");
+
+        User user4 = new User();
+        user4.setEmail("VitaliyMiller756@mail.ru");
+        user4.setBirthday(LocalDate.parse("1992-06-12"));
+        user4.setLogin("VitaliyMiller756");
+
+        int userId1 = userController.addUser(user1).getId();
+        int userId2 = userController.addUser(user2).getId();
+        int userId3 = userController.addUser(user3).getId();
+        int userId4 = userController.addUser(user4).getId();
+        userController.addToFriends(String.valueOf(userId1), String.valueOf(userId2));
+        userController.addToFriends(String.valueOf(userId2), String.valueOf(userId3));
+        userController.addToFriends(String.valueOf(userId1), String.valueOf(userId3));
+        userController.addToFriends(String.valueOf(userId2), String.valueOf(userId4));
+
+        assertTrue(userController.getCommonFriends(String.valueOf(userId1), String.valueOf(userId2)).contains(user3));
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByGetCommonFriends() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            userController.getCommonFriends(null, "1");
+        });
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByGetCommonFriends() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            userController.getCommonFriends("1", null);
+        });
+    }
 }

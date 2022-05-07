@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @Slf4j
@@ -84,5 +85,21 @@ public class UserController {
         }
 
         return userService.getAllUsersFriendsById(Integer.parseInt(userId));
+    }
+
+    @GetMapping("{id}/friends/common/{friendId}")
+    public Set<User> getCommonFriends(
+            @PathVariable(required = false) String userId,
+            @PathVariable(required = false) String friendId
+    ) throws UserNotFoundException {
+        if (userId == null) {
+            throw new IncorrectParameterException("userId");
+        }
+
+        if (friendId == null) {
+            throw new IncorrectParameterException("friendId");
+        }
+
+        return userService.getCommonFriends(Integer.parseInt(userId), Integer.parseInt(friendId));
     }
 }
