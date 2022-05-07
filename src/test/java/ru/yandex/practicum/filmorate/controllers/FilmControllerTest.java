@@ -3,10 +3,9 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -16,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class FilmControllerTest {
     @Autowired
-    private FilmController controller;
+    private FilmController filmController;
+    @Autowired
+    private UserController userController;
 
     @Test
     public void shouldBeExceptionUnderNameIsBlank() {
@@ -26,7 +27,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
@@ -41,7 +42,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
@@ -52,7 +53,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1895-12-27"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
@@ -63,7 +64,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(-100));
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
@@ -75,7 +76,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("1967-03-25"));
         film.setDuration(Duration.ofSeconds(100));
 
-        assertThrows(FilmNotFoundException.class, () -> controller.updateFilm(film));
+        assertThrows(FilmNotFoundException.class, () -> filmController.updateFilm(film));
     }
 
     @Test
@@ -88,8 +89,54 @@ class FilmControllerTest {
         film.setDuration(Duration.ofSeconds(100));
 
         assertThrows(FilmAlreadyExistException.class, () -> {
-            controller.addFilm(film);
-            controller.addFilm(film);
+            filmController.addFilm(film);
+            filmController.addFilm(film);
+        });
+    }
+
+    @Test
+    public void shouldBeAddLikeToFilm()
+            throws ValidationException, FilmAlreadyExistException, UserAlreadyExistException, FilmNotFoundException,
+            UserNotFoundException {
+
+        Film film = new Film();
+        film.setId(Integer.MAX_VALUE);
+        film.setName("Гарри Поттер 20 лет спустя: Возвращение в Хогвартс");
+        film.setDescription("Актеры великой франшизы встречаются в школе магии. Архивные кадры, ...");
+        film.setReleaseDate(LocalDate.parse("2022-01-01"));
+        film.setDuration(Duration.ofMinutes(99));
+
+        User user = new User();
+        user.setEmail("AmadeusTverskoy462@mail.ru");
+        user.setBirthday(LocalDate.parse("1992-06-12"));
+        user.setLogin("AmadeusTverskoy462");
+
+        int filmId = filmController.addFilm(film).getId();
+        int userId = userController.addUser(user).getId();
+
+        assertTrue(filmController.addLikeToFilm(
+                String.valueOf(filmId), String.valueOf(userId)).getLikes().contains(userId)
+        );
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByAddLikeToFilm() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            filmController.addLikeToFilm("1", null);
+        });
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackFilmIdParameterByAddLikeToFilm() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            filmController.addLikeToFilm(null, "1");
+        });
+    }
+
+    @Test
+    public void shouldBeUserNotFoundExceptionWhenUserNotFundByAddLikeToFilm() {
+        assertThrows(UserNotFoundException.class, () -> {
+            filmController.addLikeToFilm("1", String.valueOf(Integer.MAX_VALUE));
         });
     }
 }
