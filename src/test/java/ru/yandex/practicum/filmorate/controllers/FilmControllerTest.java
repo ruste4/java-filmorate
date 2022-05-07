@@ -139,4 +139,46 @@ class FilmControllerTest {
             filmController.addLikeToFilm("1", String.valueOf(Integer.MAX_VALUE));
         });
     }
+
+    @Test
+    public void shouldBeDeleteLikeToFilm()
+            throws ValidationException, FilmAlreadyExistException, UserAlreadyExistException,
+            FilmNotFoundException, UserNotFoundException {
+        Film film = new Film();
+        film.setId(Integer.MAX_VALUE);
+        film.setName("Бука. Мое любимое чудище");
+        film.setDescription("Скандал в царском семействе: своенравная принцесса Варвара сбежала из дворца и...");
+        film.setReleaseDate(LocalDate.parse("2021-01-01"));
+        film.setDuration(Duration.ofMinutes(99));
+
+        User user = new User();
+        user.setEmail("VeraDmitrieva330@mail.ru");
+        user.setBirthday(LocalDate.parse("1992-06-12"));
+        user.setLogin("VeraDmitrieva330");
+
+        int filmId = filmController.addFilm(film).getId();
+        int userId = userController.addUser(user).getId();
+
+        filmController.addLikeToFilm(String.valueOf(filmId), String.valueOf(userId));
+
+        assertFalse(
+                filmController.deleteLikeToFilm(String.valueOf(filmId), String.valueOf(userId))
+                        .getLikes()
+                        .contains(userId)
+        );
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackFilmIdParameterByDeleteLikeToFilm() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            filmController.addLikeToFilm(null, "1");
+        });
+    }
+
+    @Test
+    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByDeleteLikeToFilm() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            filmController.addLikeToFilm("1", null);
+        });
+    }
 }

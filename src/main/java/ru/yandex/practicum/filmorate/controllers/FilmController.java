@@ -65,4 +65,19 @@ public class FilmController {
 
         return film;
     }
+
+    @DeleteMapping("{id}/like/{userId}")
+    public Film deleteLikeToFilm(@PathVariable String id, @PathVariable String userId) throws FilmNotFoundException {
+        if (id == null) {
+            throw new IncorrectParameterException("id");
+        }
+        if (userId == null) {
+            throw new IncorrectParameterException("userId");
+        }
+
+        Film film = filmService.findFilmById(Integer.parseInt(id));
+        film.deleteLike(Integer.parseInt(userId));
+
+        return film;
+    }
 }
