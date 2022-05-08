@@ -12,10 +12,7 @@ import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -51,7 +48,7 @@ public class FilmService {
         return film;
     }
 
-    public List<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() {
         log.info("Get all films");
 
         return filmStorage.getAll();
@@ -123,7 +120,7 @@ public class FilmService {
      * @return возвращает отсортированный по количеству лайков список фильмов
      */
     public List<Film> getPopularFilms(int count) {
-        List<Film> films = filmStorage.getAll();
+        List<Film> films = new ArrayList<>(filmStorage.getAll());
         films.sort(Comparator.comparing(Film::getLikeCount).reversed());
 
         return films.subList(0, count);

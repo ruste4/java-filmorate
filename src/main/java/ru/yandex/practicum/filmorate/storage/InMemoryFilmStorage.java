@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getAll() {
-        return (List<Film>) FILMS.values();
+    public Collection<Film> getAll() {
+        return  FILMS.values();
     }
 
     @Override

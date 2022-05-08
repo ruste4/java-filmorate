@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface FilmStorage {
     /**
@@ -42,7 +42,7 @@ public interface FilmStorage {
      *
      * @return возвращает все фильмы из хранилища
      */
-    List<Film> getAll();
+    Collection<Film> getAll();
 
     /**
      * Найти по id

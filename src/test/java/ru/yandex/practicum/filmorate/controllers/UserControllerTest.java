@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +11,6 @@ import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +21,14 @@ class UserControllerTest {
     private UserController userController;
 
     @Test
-    public void shouldBeValidationExceptionUnderIncorrectEmail() {
+    public void shouldBeIncorrectParameterExceptionWithLackUserIdParameterByGetFilmById() {
+        assertThrows(IncorrectParameterException.class, () -> {
+            userController.getUserById(null);
+        });
+    }
+
+    @Test
+    public void shouldBeValidationExceptionWithIncorrectEmail() {
         User user = new User();
         user.setName("Ладимир");
         user.setEmail("q61bldiyour-mai.xyz");
@@ -34,7 +39,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeValidationExceptionUnderLoginIsBlank() {
+    public void shouldBeValidationExceptionWithLoginIsBlank() {
         User user = new User();
         user.setName("Ладимир");
         user.setEmail("q61bldi@your-mai.xyz");
@@ -45,7 +50,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeValidationExceptionUnderLoginContainsSpaces() {
+    public void shouldBeValidationExceptionWithLoginContainsSpaces() {
         User user = new User();
         user.setName("Ладимир");
         user.setEmail("q61bldi@your-mai.xyz");
@@ -56,7 +61,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeNameEqualLoginUnderNameIsBlank() throws UserAlreadyExistException, ValidationException {
+    public void shouldBeNameEqualLoginWithNameIsBlank() throws UserAlreadyExistException, ValidationException {
         User user = new User();
         user.setEmail("q61bldi1234@your-mai.xyz");
         user.setBirthday(LocalDate.parse("1973-06-12"));
@@ -67,7 +72,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeValidationExceptionUnderBirthdayInTheFuture() {
+    public void shouldBeValidationExceptionWithBirthdayInTheFuture() {
         User user = new User();
         user.setEmail("q61@your-mai.xyz");
         user.setBirthday(LocalDate.parse("2273-06-12"));
@@ -77,7 +82,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeUserNotFoundExceptionUnderUserNotAdded() {
+    public void shouldBeUserNotFoundExceptionWithUserNotAdded() {
         User user = new User();
         user.setId(Integer.MAX_VALUE);
         user.setEmail("q61@your-mai.xyz");
@@ -88,7 +93,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void shouldBeUserAlreadyExistExceptionUnderUserIsAddedSecondTime() {
+    public void shouldBeUserAlreadyExistExceptionWithUserIsAddedSecondTime() {
         User user = new User();
         user.setEmail("q6lhkfe1@your-mai.xyz");
         user.setBirthday(LocalDate.parse("1992-06-12"));
@@ -114,27 +119,27 @@ class UserControllerTest {
 
         userController.addUser(user);
         userController.addUser(friend);
-        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend.getId()));
+        userController.addToFriends(user.getId(), friend.getId());
 
         assertTrue(userController.getUserById(user.getId()).getAllFriendsId().contains(friend.getId()));
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByAddingFriend() {
+    public void shouldBeIncorrectParameterExceptionWithLackUserIdParameterByAddingFriend() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.addToFriends(null, "1");
+            userController.addToFriends(null, 1);
         });
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByAddingFriend() {
+    public void shouldBeIncorrectParameterExceptionWithLackFriendIdParameterByAddingFriend() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.addToFriends("1", null);
+            userController.addToFriends(1, null);
         });
     }
 
     @Test
-    public void shouldBeUserNotFoundExceptionUnderUserNotAddedBefore() {
+    public void shouldBeUserNotFoundExceptionWithUserNotAddedBefore() {
         User friend = new User();
         friend.setEmail("BernarKudryavtsev838@mail.ru");
         friend.setBirthday(LocalDate.parse("1992-06-12"));
@@ -142,12 +147,12 @@ class UserControllerTest {
 
         assertThrows(UserNotFoundException.class, () -> {
             int friendId = userController.addUser(friend).getId();
-            userController.addToFriends(String.valueOf(Integer.MAX_VALUE), String.valueOf(friendId));
+            userController.addToFriends(Integer.MAX_VALUE, friendId);
         });
     }
 
     @Test
-    public void shouldBeUserNotFoundExceptionUnderFriendNotAddedBefore() {
+    public void shouldBeUserNotFoundExceptionWithFriendNotAddedBefore() {
         User user = new User();
         user.setEmail("RimmaKiseleva799@mail.ru");
         user.setBirthday(LocalDate.parse("1992-06-12"));
@@ -155,7 +160,7 @@ class UserControllerTest {
 
         assertThrows(UserNotFoundException.class, () -> {
             int userId = userController.addUser(user).getId();
-            userController.addToFriends(String.valueOf(userId), String.valueOf(Integer.MAX_VALUE));
+            userController.addToFriends(userId, Integer.MAX_VALUE);
         });
     }
 
@@ -173,23 +178,23 @@ class UserControllerTest {
 
         userController.addUser(user);
         userController.addUser(friend);
-        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend.getId()));
-        userController.deleteToFriends(String.valueOf(user.getId()), String.valueOf(friend.getId()));
+        userController.addToFriends(user.getId(), friend.getId());
+        userController.deleteToFriends(user.getId(), friend.getId());
 
         assertFalse(userController.getUserById(user.getId()).getAllFriendsId().contains(friend.getId()));
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByDeleteFriend() {
+    public void shouldBeIncorrectParameterExceptionWithLackUserIdParameterByDeleteFriend() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.addToFriends(null, "1");
+            userController.addToFriends(null, 1);
         });
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByDeleteFriend() {
+    public void shouldBeIncorrectParameterExceptionWithLackFriendIdParameterByDeleteFriend() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.addToFriends("1", null);
+            userController.addToFriends(1, null);
         });
     }
 
@@ -215,15 +220,15 @@ class UserControllerTest {
         userController.addUser(friend1);
         userController.addUser(friend2);
 
-        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend1.getId()));
-        userController.addToFriends(String.valueOf(user.getId()), String.valueOf(friend2.getId()));
+        userController.addToFriends(user.getId(), friend1.getId());
+        userController.addToFriends(user.getId(), friend2.getId());
 
-        assertEquals(userController.getUsersFriends(String.valueOf(user.getId())), List.of(friend1, friend2));
+        assertEquals(userController.getUsersFriends(user.getId()), List.of(friend1, friend2));
 
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByGetUsersFriends() {
+    public void shouldBeIncorrectParameterExceptionWithLackUserIdParameterByGetUsersFriends() {
         assertThrows(IncorrectParameterException.class, () -> {
             userController.getUsersFriends(null);
         });
@@ -256,25 +261,25 @@ class UserControllerTest {
         int userId2 = userController.addUser(user2).getId();
         int userId3 = userController.addUser(user3).getId();
         int userId4 = userController.addUser(user4).getId();
-        userController.addToFriends(String.valueOf(userId1), String.valueOf(userId2));
-        userController.addToFriends(String.valueOf(userId2), String.valueOf(userId3));
-        userController.addToFriends(String.valueOf(userId1), String.valueOf(userId3));
-        userController.addToFriends(String.valueOf(userId2), String.valueOf(userId4));
+        userController.addToFriends(userId1, userId2);
+        userController.addToFriends(userId2, userId3);
+        userController.addToFriends(userId1, userId3);
+        userController.addToFriends(userId2, userId4);
 
-        assertTrue(userController.getCommonFriends(String.valueOf(userId1), String.valueOf(userId2)).contains(user3));
+        assertTrue(userController.getCommonFriends(userId1, userId2).contains(user3));
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackUserIdParameterByGetCommonFriends() {
+    public void shouldBeIncorrectParameterExceptionWithLackUserIdParameterByGetCommonFriends() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.getCommonFriends(null, "1");
+            userController.getCommonFriends(null, 1);
         });
     }
 
     @Test
-    public void shouldBeIncorrectParameterExceptionUnderLackFriendIdParameterByGetCommonFriends() {
+    public void shouldBeIncorrectParameterExceptionWithLackFriendIdParameterByGetCommonFriends() {
         assertThrows(IncorrectParameterException.class, () -> {
-            userController.getCommonFriends("1", null);
+            userController.getCommonFriends(1, null);
         });
     }
 }

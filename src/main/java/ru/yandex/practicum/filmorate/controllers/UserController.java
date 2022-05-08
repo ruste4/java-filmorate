@@ -32,7 +32,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) throws UserNotFoundException {
+    public User getUserById(@PathVariable(required = false) Integer id) throws UserNotFoundException {
+        if (id == null) {
+            throw new IncorrectParameterException("id");
+        }
+
         return userService.findUserById(id);
     }
 
@@ -48,8 +52,8 @@ public class UserController {
 
     @PutMapping("{userId}/friends/{friendId}")
     public User addToFriends(
-            @PathVariable(required = false) String userId,
-            @PathVariable(required = false) String friendId) throws UserNotFoundException {
+            @PathVariable(required = false) Integer userId,
+            @PathVariable(required = false) Integer friendId) throws UserNotFoundException {
 
         if (userId == null) {
             throw new IncorrectParameterException("userId");
@@ -59,13 +63,13 @@ public class UserController {
             throw new IncorrectParameterException("friendId");
         }
 
-        return userService.addNewFriendToTheUser(Integer.parseInt(userId), Integer.parseInt(friendId));
+        return userService.addNewFriendToTheUser(userId, friendId);
     }
 
     @DeleteMapping("{userId}/friends/{friendId}")
     public User deleteToFriends(
-            @PathVariable(required = false) String userId,
-            @PathVariable(required = false) String friendId
+            @PathVariable(required = false) Integer userId,
+            @PathVariable(required = false) Integer friendId
     ) throws UserNotFoundException {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
@@ -75,22 +79,22 @@ public class UserController {
             throw new IncorrectParameterException("friendId");
         }
 
-        return userService.deleteFriendToTheUser(Integer.parseInt(userId), Integer.parseInt(friendId));
+        return userService.deleteFriendToTheUser(userId, friendId);
     }
 
     @GetMapping("{id}/friends")
-    public List<User> getUsersFriends(@PathVariable(required = false) String userId) throws UserNotFoundException {
+    public List<User> getUsersFriends(@PathVariable(required = false) Integer userId) throws UserNotFoundException {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }
 
-        return userService.getAllUsersFriendsById(Integer.parseInt(userId));
+        return userService.getAllUsersFriendsById(userId);
     }
 
     @GetMapping("{id}/friends/common/{friendId}")
     public Set<User> getCommonFriends(
-            @PathVariable(required = false) String userId,
-            @PathVariable(required = false) String friendId
+            @PathVariable(required = false) Integer userId,
+            @PathVariable(required = false) Integer friendId
     ) throws UserNotFoundException {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
@@ -100,6 +104,6 @@ public class UserController {
             throw new IncorrectParameterException("friendId");
         }
 
-        return userService.getCommonFriends(Integer.parseInt(userId), Integer.parseInt(friendId));
+        return userService.getCommonFriends(userId, friendId);
     }
 }

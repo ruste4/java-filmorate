@@ -26,7 +26,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> findAll() {
+    public Collection<Film> findAll() {
         return filmService.getAllFilms();
     }
 
@@ -46,7 +46,7 @@ public class FilmController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public Film addLikeToFilm(@PathVariable String id, @PathVariable String userId)
+    public Film addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId)
             throws FilmNotFoundException, UserNotFoundException {
         if (id == null) {
             throw new IncorrectParameterException("id");
@@ -54,20 +54,20 @@ public class FilmController {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }
-        User user = userService.findUserById(Integer.parseInt(userId));
+        User user = userService.findUserById(userId);
 
         if (user == null) {
             throw new UserNotFoundException("User " + userId + " not found");
         }
 
-        Film film = filmService.findFilmById(Integer.parseInt(id));
-        film.addLike(Integer.parseInt(userId));
+        Film film = filmService.findFilmById(id);
+        film.addLike(userId);
 
         return film;
     }
 
     @DeleteMapping("{id}/like/{userId}")
-    public Film deleteLikeToFilm(@PathVariable String id, @PathVariable String userId) throws FilmNotFoundException {
+    public Film deleteLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) throws FilmNotFoundException {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }
@@ -75,9 +75,16 @@ public class FilmController {
             throw new IncorrectParameterException("userId");
         }
 
-        Film film = filmService.findFilmById(Integer.parseInt(id));
-        film.deleteLike(Integer.parseInt(userId));
+        Film film = filmService.findFilmById(id);
+        film.deleteLike(userId);
 
         return film;
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(
+            @RequestParam(defaultValue = "10", required = false) Integer count
+    ) {
+        return filmService.getPopularFilms(count);
     }
 }
