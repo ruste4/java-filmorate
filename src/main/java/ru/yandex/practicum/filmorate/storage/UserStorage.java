@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface UserStorage {
     /**

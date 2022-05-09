@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.validators.UserValidator;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Collection<User> getAll() {
-        return  USERS.values();
+        return USERS.values();
     }
 
     @Override
