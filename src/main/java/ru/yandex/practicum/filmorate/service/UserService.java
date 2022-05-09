@@ -9,10 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -45,7 +42,7 @@ public class UserService {
         return user;
     }
 
-    public List<User> getAllUsers() {
+    public Collection<User> getAllUsers() {
         log.info("Get all users");
 
         return storage.getAll();

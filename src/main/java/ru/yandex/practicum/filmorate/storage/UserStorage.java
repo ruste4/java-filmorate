@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserStorage {
@@ -42,7 +43,7 @@ public interface UserStorage {
      *
      * @return возвращает всех пользователей из хранилища
      */
-    List<User> getAll();
+    Collection<User> getAll();
 
     /**
      * Найти по id

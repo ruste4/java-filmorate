@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getAll() {
-        return (List<User>) USERS.values();
+    public Collection<User> getAll() {
+        return  USERS.values();
     }
 
     @Override

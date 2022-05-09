@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,8 +24,8 @@ public class InMemoryFilmStorage implements FilmStorage {
                     "Film " + film.getName() + " " + film.getReleaseDate() + " добавлен ранее"
             );
         }
-        film.setId(ID_HOLDER.incrementAndGet());
         FilmValidator.validate(film);
+        film.setId(ID_HOLDER.incrementAndGet());
         FILMS.put(film.getId(), film);
 
         return film;

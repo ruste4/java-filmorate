@@ -82,7 +82,7 @@ public class UserController {
         return userService.deleteFriendToTheUser(userId, friendId);
     }
 
-    @GetMapping("{id}/friends")
+    @GetMapping("{userId}/friends")
     public List<User> getUsersFriends(@PathVariable(required = false) Integer userId) throws UserNotFoundException {
         if (userId == null) {
             throw new IncorrectParameterException("userId");

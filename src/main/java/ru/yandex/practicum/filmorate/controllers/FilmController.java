@@ -51,9 +51,11 @@ public class FilmController {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }
+
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }
+
         User user = userService.findUserById(userId);
 
         if (user == null) {
@@ -71,8 +73,15 @@ public class FilmController {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }
+
         if (userId == null) {
             throw new IncorrectParameterException("userId");
+        }
+
+        User user = userService.findUserById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException("User " + userId + " not found");
         }
 
         Film film = filmService.findFilmById(id);

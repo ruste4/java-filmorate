@@ -10,19 +10,19 @@ public class FilmValidator {
 
     public static void validate(Film film) throws ValidationException {
         if (film.getName() == null || film.getName().isBlank()) {
-            throw new ValidationException("name: не может быть пустым");
+            throw new ValidationException("name", "не может быть пустым");
         }
 
         if (film.getDescription().length() > 200) {
-            throw new ValidationException("Максимальная длина description — 200 символов");
+            throw new ValidationException("description", "максимальная длина — 200 символов");
         }
 
         if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            throw new ValidationException("releaseDate: должен быть не раньше 28 декабря 1895 года");
+            throw new ValidationException("releaseDate", "должен быть не раньше 28 декабря 1895 года");
         }
 
         if (film.getDuration().isNegative()) {
-            throw new ValidationException("duration: должна быть положительной");
+            throw new ValidationException("duration", "должна быть положительной");
         }
     }
 }

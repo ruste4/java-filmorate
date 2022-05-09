@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -123,7 +124,7 @@ public class FilmService {
         List<Film> films = new ArrayList<>(filmStorage.getAll());
         films.sort(Comparator.comparing(Film::getLikeCount).reversed());
 
-        return films.subList(0, count);
+        return films.stream().limit(count).collect(Collectors.toList());
     }
 
 }

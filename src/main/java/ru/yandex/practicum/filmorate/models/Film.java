@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -16,13 +18,14 @@ public class Film {
     private int id;
     @NotNull
     private String name;
-    @NotNull
+    @NotBlank
     @EqualsAndHashCode.Exclude
     private String description;
     @NotNull
     private LocalDate releaseDate;
     @NotNull
     @EqualsAndHashCode.Exclude
+    @JsonSerialize(using = DurationSerializer.class)
     private Duration duration;
     private Set<Integer> likes = new HashSet<>();
 
