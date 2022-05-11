@@ -21,7 +21,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film add(Film film) throws FilmAlreadyExistException, ValidationException {
         if (FILMS.containsValue(film)) {
             throw new FilmAlreadyExistException(
-                    "Film " + film.getName() + " " + film.getReleaseDate() + " добавлен ранее"
+                    "Film " + film.getName() + " " + film.getReleaseDate() + " already exist"
             );
         }
         FilmValidator.validate(film);
@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film deleteById(int id) throws FilmNotFoundException {
         Film film = FILMS.remove(id);
         if (film == null) {
-            throw new FilmNotFoundException("Фильм с id:" + id + " не найден");
+            throw new FilmNotFoundException("Film with id:" + id + " not found");
         }
 
         return film;
@@ -44,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) throws FilmNotFoundException, ValidationException {
         if (!FILMS.containsKey(film.getId())) {
-            throw new FilmNotFoundException("Фильм с id:" + film.getId() + " не найден");
+            throw new FilmNotFoundException("Film with id:" + film.getId() + " not found");
         }
         FilmValidator.validate(film);
         FILMS.put(film.getId(), film);
@@ -61,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film findById(int id) throws FilmNotFoundException {
         Film film = FILMS.get(id);
         if (film == null) {
-            throw new FilmNotFoundException("Фильм с id:" + id + " не найден");
+            throw new FilmNotFoundException("Film with id:" + id + " not found");
         }
 
         return film;

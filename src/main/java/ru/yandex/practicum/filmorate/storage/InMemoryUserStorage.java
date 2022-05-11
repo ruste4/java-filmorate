@@ -20,7 +20,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User add(User user) throws UserAlreadyExistException, ValidationException {
         if (USERS.containsValue(user)) {
-            throw new UserAlreadyExistException("Пользователь с email:" + user.getEmail() + " добавлен ранее");
+            throw new UserAlreadyExistException("User with email:" + user.getEmail() + " already exist");
         }
         user.setId(ID_HOLDER.incrementAndGet());
         UserValidator.validate(user);
@@ -33,7 +33,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User deleteById(int id) throws UserNotFoundException {
         User user = USERS.remove(id);
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id:" + id + " не найден");
+            throw new UserNotFoundException("User with id:" + id + " not found");
         }
 
         return user;
@@ -42,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) throws UserNotFoundException, ValidationException {
         if (!USERS.containsKey(user.getId())) {
-            throw new UserNotFoundException("Пользователь с id:" + user.getId() + " не найден");
+            throw new UserNotFoundException("User with:" + user.getId() + " not found");
         }
         UserValidator.validate(user);
         USERS.put(user.getId(), user);
@@ -59,7 +59,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User findById(int id) throws UserNotFoundException {
         User user = USERS.get(id);
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id:" + id + " не найден");
+            throw new UserNotFoundException("User with id:" + id + " not found");
         }
 
         return user;

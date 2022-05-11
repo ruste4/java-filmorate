@@ -30,21 +30,21 @@ public class FilmService {
 
     public Film addFilm(Film film) throws ValidationException, FilmAlreadyExistException {
         Film newFilm = filmStorage.add(film);
-        log.info("Add " + film);
+        log.info("Add {}", film);
 
         return newFilm;
     }
 
     public Film deleteFilm(int id) throws FilmNotFoundException {
         Film film = filmStorage.deleteById(id);
-        log.info("Delete " + film);
+        log.info("Delete {}", film);
 
         return film;
     }
 
     public Film updateFilm(Film film) throws FilmNotFoundException, ValidationException {
         filmStorage.update(film);
-        log.info("Update Film.id:" + film.getId() + " on " + film);
+        log.info("Update Film.id:{} on {}", film.getId(), film);
 
         return film;
     }
@@ -57,7 +57,7 @@ public class FilmService {
 
     public Film findFilmById(int id) throws FilmNotFoundException {
         Film film = filmStorage.findById(id);
-        log.info("Find film dy id:" + id);
+        log.info("Find film dy id:{}", id);
 
         return film;
     }
@@ -73,7 +73,7 @@ public class FilmService {
     public Film addLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
         Film film = filmStorage.findById(filmId);
         film.addLike(userId);
-        log.info("User.id:" + userId + " add like to Film.id:" + filmId);
+        log.info("User.id:{} add like to Film.id:{}", userId, filmId);
 
         return film;
     }
@@ -89,7 +89,7 @@ public class FilmService {
     public Film deleteLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
         Film film = filmStorage.findById(filmId);
         film.deleteLike(userId);
-        log.info("User.id:" + userId + " delete like to Film.id:" + filmId);
+        log.info("User.id:{} delete like to Film.id:{}", userId, filmId);
 
         return film;
     }
@@ -109,7 +109,7 @@ public class FilmService {
         for (int userId : film.getLikes()) {
             userLikes.add(userStorage.findById(userId));
         }
-        log.info("Get all likes of Film.id:" + filmId);
+        log.info("Get all likes of Film.id:{}", filmId);
 
         return userLikes;
     }
@@ -123,6 +123,7 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         List<Film> films = new ArrayList<>(filmStorage.getAll());
         films.sort(Comparator.comparing(Film::getLikeCount).reversed());
+        log.info("Get popular films");
 
         return films.stream().limit(count).collect(Collectors.toList());
     }

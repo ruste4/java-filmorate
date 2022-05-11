@@ -23,21 +23,21 @@ public class UserService {
 
     public User addUser(User user) throws UserAlreadyExistException, ValidationException {
         User newUser = storage.add(user);
-        log.info("Add " + user);
+        log.info("Add {}", user);
 
         return newUser;
     }
 
     public User deleteUser(int id) throws UserNotFoundException {
         User user = storage.deleteById(id);
-        log.info("Delete " + user);
+        log.info("Delete {}", user);
 
         return user;
     }
 
     public User updateUser(User user) throws UserNotFoundException, ValidationException {
         storage.update(user);
-        log.info("Update User.id:" + user.getId() + " on " + user);
+        log.info("Update User.id:{} on {}", user.getId(), user);
 
         return user;
     }
@@ -50,7 +50,7 @@ public class UserService {
 
     public User findUserById(int id) throws UserNotFoundException {
         User user = storage.findById(id);
-        log.info("Find user by id:" + id);
+        log.info("Find user by id:{}", id);
 
         return user;
     }
@@ -71,7 +71,7 @@ public class UserService {
             User friend = storage.findById(friendId);
             friends.add(friend);
         }
-        log.info("Get all users friends by id:" + id);
+        log.info("Get all users friends by id:{}", id);
 
         return friends;
     }
@@ -90,7 +90,7 @@ public class UserService {
         user.addNewFriend(friendId);
         friend.addNewFriend(userId);
 
-        log.info("Add new User.id:" + friendId + "to the friends list at User.id:" + userId);
+        log.info("Add new User.id:{} to the friends list at User.id:{}", friendId, userId);
 
         return user;
     }
@@ -109,7 +109,7 @@ public class UserService {
         user.deleteFriend(friendId);
         friend.deleteFriend(userId);
 
-        log.info("Delete User.id:" + friendId + " from the friends list at User.id:" + userId);
+        log.info("Delete User.id:{} from the friends list at User.id:{}", friendId, userId);
 
         return user;
     }
@@ -133,7 +133,7 @@ public class UserService {
                 commonFriends.add(commonFriend);
             }
         }
-        log.info("Get common friends User.id:" + userId + " and User.id:" + friendId);
+        log.info("Get common friends User.id:{} and User.id:{}", userId, friendId);
 
         return commonFriends;
     }
