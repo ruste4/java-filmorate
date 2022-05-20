@@ -124,7 +124,7 @@ public class UserService {
      */
     public Set<User> getCommonFriends(int userId, int friendId) throws UserNotFoundException {
         User user = storage.findById(userId);
-        User friend = storage.findById(userId);
+        User friend = storage.findById(friendId);
         Set<User> commonFriends = new HashSet<>();
 
         for (int userFriendId : user.getAllFriendsId()) {

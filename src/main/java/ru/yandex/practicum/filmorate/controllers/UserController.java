@@ -91,7 +91,7 @@ public class UserController {
         return userService.getAllUsersFriendsById(userId);
     }
 
-    @GetMapping("{id}/friends/common/{friendId}")
+    @GetMapping("{userId}/friends/common/{friendId}")
     public Set<User> getCommonFriends(
             @PathVariable(required = false) Integer userId,
             @PathVariable(required = false) Integer friendId
