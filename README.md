@@ -62,29 +62,64 @@ SELECT u.user_id,
        u.birthday
 FROM friendship AS f
 INNER JOIN users AS u ON u.user_id = f.friend_id
-WHERE f.user_id = user_id;
+WHERE f.user_id = userId AND f.accept = true
+UNION
+SELECT u.user_id,
+       u.email,
+       u.login,
+       u.name,
+       u.birthday
+FROM friendship AS f
+INNER JOIN users AS u ON u.user_id = f.user_id
+WHERE f.friend_id = userId AND f.accept = true;
 ```
 
 ### Получить общих друзей
 GET users/{userId}/friends/common/{friendId}
 ```roomsql
-SELECT u.user_id,
-       u.email,
-       u.login,
-       u.name,
-       u.birthday
-FROM friendship AS f
-INNER JOIN users AS u ON f.friend_id = u.user_id
-WHERE f.user_id = userId
+SELECT *
+FROM (
+    SELECT u.user_id,
+           u.email,
+           u.login,
+           u.name,
+           u.birthday
+    FROM friendship AS f
+    INNER JOIN users AS u ON u.user_id = f.friend_id
+    WHERE f.user_id = userId AND f.accept = true
+    UNION
+    SELECT u.user_id,
+           u.email,
+           u.login,
+           u.name,
+           u.birthday
+    FROM friendship AS f
+    INNER JOIN users AS u ON u.user_id = f.user_id
+    WHERE f.friend_id = userId AND f.accept = true
+) AS t1
+
 INTERSECT
-SELECT u.user_id,
-       u.email,
-       u.login,
-       u.name,
-       u.birthday
-FROM friendship AS f
-INNER JOIN users AS u ON f.friend_id = u.user_id
-WHERE f.user_id = friendId;
+
+SELECT *
+FROM (
+    SELECT u.user_id,
+           u.email,
+           u.login,
+           u.name,
+           u.birthday
+    FROM friendship AS f
+    INNER JOIN users AS u ON u.user_id = f.friend_id
+    WHERE f.user_id = friendId AND f.accept = true
+    UNION
+    SELECT u.user_id,
+           u.email,
+           u.login,
+           u.name,
+           u.birthday
+    FROM friendship AS f
+    INNER JOIN users AS u ON u.user_id = f.user_id
+    WHERE f.friend_id = friendId AND f.accept = true
+) AS t2
 ```
 ## Работа с фильмами
 
