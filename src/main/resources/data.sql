@@ -48,3 +48,11 @@ VALUES
 (2,3),
 (2,4),
 (2,2);
+
+INSERT INTO film_genre (film_id, genre_id)
+VALUES
+(1, 1),
+(1, 2),
+(1, 4),
+(2, 3),
+(2, 2);
