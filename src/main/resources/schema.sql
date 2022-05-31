@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS films (
     film_id int   NOT NULL AUTO_INCREMENT,
     name varchar(255)   NOT NULL,
-    rating_name varchar(255)   NOT NULL,
+    rating_id int   NOT NULL,
     release_date date   NOT NULL,
     duration int   NOT NULL,
     description varchar(200)   NOT NULL,
@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS films (
 );
 
 CREATE TABLE IF NOT EXISTS rating (
+    rating_id int   NOT NULL,
     rating_name varchar(255)   NOT NULL,
-    description varchar(225)   NOT NULL,
     CONSTRAINT pk_rating PRIMARY KEY (
-        rating_name
+        rating_id
      )
 );
 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS likes (
 CREATE TABLE IF NOT EXISTS friendship (
     user_id int   NOT NULL,
     friend_id int   NOT NULL,
-    accept bool  DEFAULT false NOT NULL,
+    accept bool  NOT NULL DEFAULT FALSE,
     CONSTRAINT pk_friendship PRIMARY KEY (
         user_id,friend_id
      )
@@ -55,15 +55,15 @@ CREATE TABLE IF NOT EXISTS film_genre (
 );
 
 CREATE TABLE IF NOT EXISTS genre (
-    genre_id int   NOT NULL AUTO_INCREMENT,
+    genre_id int   NOT NULL,
     name varchar(255)   NOT NULL,
     CONSTRAINT pk_genre PRIMARY KEY (
         genre_id
      )
 );
 
-ALTER TABLE films ADD CONSTRAINT IF NOT EXISTS fk_films_rating_name FOREIGN KEY(rating_name)
-REFERENCES rating (rating_name);
+ALTER TABLE films ADD CONSTRAINT IF NOT EXISTS fk_films_rating_id FOREIGN KEY(rating_id)
+REFERENCES rating (rating_id);
 
 ALTER TABLE likes ADD CONSTRAINT IF NOT EXISTS fk_likes_film_id FOREIGN KEY(film_id)
 REFERENCES films (film_id);

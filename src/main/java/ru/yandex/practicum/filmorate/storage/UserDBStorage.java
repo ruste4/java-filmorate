@@ -15,9 +15,7 @@ import ru.yandex.practicum.filmorate.validators.UserValidator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component("userDBStorage")
@@ -31,6 +29,7 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public User add(User user) throws UserAlreadyExistException, ValidationException {
+        UserValidator.validate(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
@@ -114,14 +113,135 @@ public class UserDBStorage implements UserStorage {
 
     }
 
-    private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
-        User user = new User();
-        user.setId(rs.getInt("user_id"));
-        user.setEmail(rs.getString("email"));
-        user.setLogin(rs.getString("login"));
-        user.setName(rs.getString("name"));
-        user.setBirthday(LocalDate.parse(rs.getString("birthday")));
+    @Override
+    public User addFriend(int userId, int friendId) {
+        User user = findById(userId);
+        findById(friendId); // throw UserNotFoundException if user does not exist
+        String sqlQuery = "INSERT INTO friendship (user_id, friend_id)\n" +
+                "VALUES\n" +
+                "(?, ?);";
+
+        jdbcTemplate.update(sqlQuery, userId, friendId);
 
         return user;
+    }
+
+    @Override
+    public User deleteFriendToTheUser(int userId, int friendId) {
+        User user = findById(userId);
+
+        String sqlQuery = "DELETE FROM friendship\n" +
+                "WHERE user_id = ?\n" +
+                "     AND friend_id = ?;";
+
+        int deleteResult = jdbcTemplate.update(sqlQuery, userId, friendId);
+
+        if (deleteResult == 0) {
+            throw new UserNotFoundException("User with:" + friendId + " not found");
+        }
+
+        return user;
+    }
+
+    @Override
+    public Set<User> getCommonFriends(int userId, int friendId) {
+        findById(userId);   // throw UserNotFoundException if user does not exist
+        findById(friendId);
+
+        String sqlQuery = "SELECT *\n" +
+                "FROM (\n" +
+                "    SELECT u.user_id,\n" +
+                "           u.email,\n" +
+                "           u.login,\n" +
+                "           u.name,\n" +
+                "           u.birthday\n" +
+                "    FROM friendship AS f\n" +
+                "    INNER JOIN users AS u ON u.user_id = f.friend_id\n" +
+                "    WHERE f.user_id = ? \n" +
+                "    UNION\n" +
+                "    SELECT u.user_id,\n" +
+                "           u.email,\n" +
+                "           u.login,\n" +
+                "           u.name,\n" +
+                "           u.birthday\n" +
+                "    FROM friendship AS f\n" +
+                "    INNER JOIN users AS u ON u.user_id = f.user_id\n" +
+                "    WHERE f.friend_id = ? AND f.accept = true\n" +
+                ") AS t1\n" +
+                "\n" +
+                "INTERSECT\n" +
+                "\n" +
+                "SELECT *\n" +
+                "FROM (\n" +
+                "    SELECT u.user_id,\n" +
+                "           u.email,\n" +
+                "           u.login,\n" +
+                "           u.name,\n" +
+                "           u.birthday\n" +
+                "    FROM friendship AS f\n" +
+                "    INNER JOIN users AS u ON u.user_id = f.friend_id\n" +
+                "    WHERE f.user_id = ? \n" +
+                "    UNION\n" +
+                "    SELECT u.user_id,\n" +
+                "           u.email,\n" +
+                "           u.login,\n" +
+                "           u.name,\n" +
+                "           u.birthday\n" +
+                "    FROM friendship AS f\n" +
+                "    INNER JOIN users AS u ON u.user_id = f.user_id\n" +
+                "    WHERE f.friend_id = ? AND f.accept = true\n" +
+                ") AS t2";
+
+        List<User> queryResult = jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, userId, friendId, friendId);
+
+        return Set.copyOf(queryResult);
+    }
+
+    @Override
+    public List<User> getAllUsersFriendsById(int id) {
+        String sqlQuery = "SELECT u.user_id,\n" +
+                "       u.email,\n" +
+                "       u.login,\n" +
+                "       u.name,\n" +
+                "       u.birthday\n" +
+                "FROM friendship AS f\n" +
+                "INNER JOIN users AS u ON u.user_id = f.friend_id\n" +
+                "WHERE f.user_id = ? \n" +
+                "UNION\n" +
+                "SELECT u.user_id,\n" +
+                "       u.email,\n" +
+                "       u.login,\n" +
+                "       u.name,\n" +
+                "       u.birthday\n" +
+                "FROM friendship AS f\n" +
+                "INNER JOIN users AS u ON u.user_id = f.user_id\n" +
+                "WHERE f.friend_id = ? AND f.accept = true;";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, id);
+    }
+
+    private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
+        return User.builder()
+                .id(rs.getInt("user_id"))
+                .email(rs.getString("email"))
+                .login(rs.getString("login"))
+                .name(rs.getString("name"))
+                .birthday(LocalDate.parse(rs.getString("birthday")))
+                .friendsId(Set.copyOf(getUserFriendsIds(rs.getInt("user_id"))))
+                .build();
+    }
+
+    private Collection<Integer> getUserFriendsIds(int id) {
+        String sqlQuery = "SELECT u.user_id\n" +
+                "FROM friendship AS f\n" +
+                "INNER JOIN users AS u ON u.user_id = f.friend_id\n" +
+                "WHERE f.user_id = ? AND f.accept = true\n" +
+                "UNION\n" +
+                "SELECT u.user_id\n" +
+                "FROM friendship AS f\n" +
+                "INNER JOIN users AS u ON u.user_id = f.user_id\n" +
+                "WHERE f.friend_id = ? AND f.accept = true;";
+
+        return jdbcTemplate.query(sqlQuery, (ResultSet rs, int num) -> rs.getInt("user_id"), id, id);
     }
 }

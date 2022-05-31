@@ -32,7 +32,7 @@ public class FilmDBStorage implements FilmStorage {
 
         Map<String, Object> values = new HashMap<>();
         values.put("name", film.getName());
-//        values.put("rating_name", film.getRating());
+        values.put("rating", film.getRate());
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
         values.put("description", film.getDescription());

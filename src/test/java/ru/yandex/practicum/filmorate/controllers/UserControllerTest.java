@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
@@ -15,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 class UserControllerTest {
 
     @Autowired
@@ -29,43 +31,48 @@ class UserControllerTest {
 
     @Test
     public void shouldBeValidationExceptionWithIncorrectEmail() {
-        User user = new User();
-        user.setName("Ладимир");
-        user.setEmail("q61bldiyour-mai.xyz");
-        user.setBirthday(LocalDate.parse("1973-06-12"));
-        user.setLogin("LadimirPodnebesnyy518");
+        User user = User.builder()
+                .name("Ладимир")
+                .email("q61bldiyour-mai.xyz")
+                .birthday(LocalDate.parse("1973-06-12"))
+                .login("LadimirPodnebesnyy518")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
     @Test
     public void shouldBeValidationExceptionWithLoginIsBlank() {
-        User user = new User();
-        user.setName("Ладимир");
-        user.setEmail("q61bldi@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("1973-06-12"));
-        user.setLogin("");
+        User user = User.builder()
+                .name("Ладимир")
+                .email("q61bldi@your-mai.xyz")
+                .birthday(LocalDate.parse("1973-06-12"))
+                .login("")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
     @Test
     public void shouldBeValidationExceptionWithLoginContainsSpaces() {
-        User user = new User();
-        user.setName("Ладимир");
-        user.setEmail("q61bldi@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("1973-06-12"));
-        user.setLogin("LadimirPod nebesnyy518");
+        User user = User.builder()
+                .name("Ладимир")
+                .email("q61bldi@your-mai.xyz")
+                .birthday(LocalDate.parse("1973-06-12"))
+                .login("LadimirPod nebesnyy518")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
     @Test
     public void shouldBeNameEqualLoginWithNameIsBlank() throws UserAlreadyExistException, ValidationException {
-        User user = new User();
-        user.setEmail("q61bldi1234@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("1973-06-12"));
-        user.setLogin("LadimirPodnebesnyy518");
+        User user = User.builder()
+                .email("q61bldi1234@your-mai.xyz")
+                .birthday(LocalDate.parse("1973-06-12"))
+                .login("LadimirPodnebesnyy518")
+                .build();
+
         userController.addUser(user);
 
         assertEquals(user.getName(), user.getLogin());
@@ -73,31 +80,34 @@ class UserControllerTest {
 
     @Test
     public void shouldBeValidationExceptionWithBirthdayInTheFuture() {
-        User user = new User();
-        user.setEmail("q61@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("2273-06-12"));
-        user.setLogin("LadimirPodnebesnyy518");
+        User user = User.builder()
+                .email("q61@your-mai.xyz")
+                .birthday(LocalDate.parse("2273-06-12"))
+                .login("LadimirPodnebesnyy518")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
     @Test
     public void shouldBeUserNotFoundExceptionWithUserNotAdded() {
-        User user = new User();
-        user.setId(Integer.MAX_VALUE);
-        user.setEmail("q61@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("LadimirPodnebesnyy518");
+        User user = User.builder()
+                .id(Integer.MAX_VALUE)
+                .email("q61@your-mai.xyz")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("LadimirPodnebesnyy518")
+                .build();
 
         assertThrows(UserNotFoundException.class, () -> userController.updateUser(user));
     }
 
     @Test
     public void shouldBeUserAlreadyExistExceptionWithUserIsAddedSecondTime() {
-        User user = new User();
-        user.setEmail("q6lhkfe1@your-mai.xyz");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("LadimirPodnebesnyy518");
+        User user = User.builder()
+                .email("q6lhkfe1@your-mai.xyz")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("LadimirPodnebesnyy518")
+                .build();
 
         assertThrows(UserAlreadyExistException.class, () -> {
             userController.addUser(user);
@@ -107,21 +117,23 @@ class UserControllerTest {
 
     @Test
     public void shouldBeAddingFriend() throws UserAlreadyExistException, ValidationException, UserNotFoundException {
-        User user = new User();
-        user.setEmail("vysheslavKukolevskiy589@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("EvgeinyaSaharova604");
+        User user = User.builder()
+                .email("vysheslavKukolevskiy589@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("EvgeinyaSaharova604")
+                .build();
 
-        User friend = new User();
-        friend.setEmail("AgrippinaGronskaya40@mail.ru");
-        friend.setBirthday(LocalDate.parse("1992-06-12"));
-        friend.setLogin("AgrippinaGronskaya40");
+        User friend = User.builder()
+                .email("AgrippinaGronskaya40@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("AgrippinaGronskaya40")
+                .build();
 
         userController.addUser(user);
         userController.addUser(friend);
         userController.addToFriends(user.getId(), friend.getId());
 
-        assertTrue(userController.getUserById(user.getId()).getAllFriendsId().contains(friend.getId()));
+        assertTrue(userController.getUserById(user.getId()).getFriendsId().contains(friend.getId()));
     }
 
     @Test
@@ -140,10 +152,11 @@ class UserControllerTest {
 
     @Test
     public void shouldBeUserNotFoundExceptionWithUserNotAddedBefore() {
-        User friend = new User();
-        friend.setEmail("BernarKudryavtsev838@mail.ru");
-        friend.setBirthday(LocalDate.parse("1992-06-12"));
-        friend.setLogin("BernarKudryavtsev838");
+        User friend = User.builder()
+                .email("BernarKudryavtsev838@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("BernarKudryavtsev838")
+                .build();
 
         assertThrows(UserNotFoundException.class, () -> {
             int friendId = userController.addUser(friend).getId();
@@ -153,10 +166,11 @@ class UserControllerTest {
 
     @Test
     public void shouldBeUserNotFoundExceptionWithFriendNotAddedBefore() {
-        User user = new User();
-        user.setEmail("RimmaKiseleva799@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("RimmaKiseleva799");
+        User user = User.builder()
+                .email("RimmaKiseleva799@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("RimmaKiseleva799")
+                .build();
 
         assertThrows(UserNotFoundException.class, () -> {
             int userId = userController.addUser(user).getId();
@@ -166,22 +180,24 @@ class UserControllerTest {
 
     @Test
     public void shouldBeDeleteFriend() throws UserAlreadyExistException, ValidationException, UserNotFoundException {
-        User user = new User();
-        user.setEmail("NinelVishnevskaya404@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("NinelVishnevskaya404");
+        User user = User.builder()
+                .email("NinelVishnevskaya404@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("NinelVishnevskaya404")
+                .build();
 
-        User friend = new User();
-        friend.setEmail("LyubomiraUlanova945@mail.ru");
-        friend.setBirthday(LocalDate.parse("1992-06-12"));
-        friend.setLogin("LyubomiraUlanova945");
+        User friend = User.builder()
+                .email("LyubomiraUlanova945@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("LyubomiraUlanova945")
+                .build();
 
         userController.addUser(user);
         userController.addUser(friend);
         userController.addToFriends(user.getId(), friend.getId());
         userController.deleteToFriends(user.getId(), friend.getId());
 
-        assertFalse(userController.getUserById(user.getId()).getAllFriendsId().contains(friend.getId()));
+        assertFalse(userController.getUserById(user.getId()).getFriendsId().contains(friend.getId()));
     }
 
     @Test
@@ -201,20 +217,23 @@ class UserControllerTest {
     @Test
     public void shouldBeGetAllUsersFriends()
             throws UserAlreadyExistException, ValidationException, UserNotFoundException {
-        User user = new User();
-        user.setEmail("ZaharZhuravel871@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("ZaharZhuravel871");
+        User user = User.builder()
+                .email("ZaharZhuravel871@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("ZaharZhuravel871")
+                .build();
 
-        User friend1 = new User();
-        friend1.setEmail("AfanasiySekunov317@mail.ru");
-        friend1.setBirthday(LocalDate.parse("1992-06-12"));
-        friend1.setLogin("AfanasiySekunov317");
+        User friend1 = User.builder()
+                .email("AfanasiySekunov317@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("AfanasiySekunov317")
+                .build();
 
-        User friend2 = new User();
-        friend2.setEmail("FotiyPotapov83@mail.ru");
-        friend2.setBirthday(LocalDate.parse("1992-06-12"));
-        friend2.setLogin("FotiyPotapov83");
+        User friend2 = User.builder()
+                .email("FotiyPotapov83@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("FotiyPotapov83")
+                .build();
 
         userController.addUser(user);
         userController.addUser(friend1);
@@ -237,25 +256,29 @@ class UserControllerTest {
     @Test
     public void shouldBeGetCommonFriends()
             throws UserAlreadyExistException, ValidationException, UserNotFoundException {
-        User user1 = new User();
-        user1.setEmail("PankratiyNektov295@mail.ru");
-        user1.setBirthday(LocalDate.parse("1992-06-12"));
-        user1.setLogin("PankratiyNektov295");
+        User user1 = User.builder()
+                .email("PankratiyNektov295@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("PankratiyNektov295")
+                .build();
 
-        User user2 = new User();
-        user2.setEmail("OksanaLeonova655@mail.ru");
-        user2.setBirthday(LocalDate.parse("1992-06-12"));
-        user2.setLogin("OksanaLeonova655");
+        User user2 = User.builder()
+                .email("OksanaLeonova655@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("OksanaLeonova655")
+                .build();
 
-        User user3 = new User();
-        user3.setEmail("NinelYandutova679@mail.ru");
-        user3.setBirthday(LocalDate.parse("1992-06-12"));
-        user3.setLogin("NinelYandutova679");
+        User user3 = User.builder()
+                .email("NinelYandutova679@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("NinelYandutova679")
+                .build();
 
-        User user4 = new User();
-        user4.setEmail("VitaliyMiller756@mail.ru");
-        user4.setBirthday(LocalDate.parse("1992-06-12"));
-        user4.setLogin("VitaliyMiller756");
+        User user4 = User.builder()
+                .email("VitaliyMiller756@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("VitaliyMiller756")
+                .build();
 
         int userId1 = userController.addUser(user1).getId();
         int userId2 = userController.addUser(user2).getId();

@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public interface UserStorage {
     /**
@@ -52,4 +54,37 @@ public interface UserStorage {
      * @throws UserNotFoundException если пользователя с переданным id нет в хранилище
      */
     User findById(int id) throws UserNotFoundException;
+
+    /**
+     * Добавить нового друга пользователю
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга, которого нужно добавить в друзья пользователю
+     */
+    User addFriend(int userId, int friendId);
+
+    /**
+     * Удалить друга у ползователя
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга, которого нужно удалить из друзей пользователя
+     */
+    User deleteFriendToTheUser(int userId, int friendId);
+
+    /**
+     * Получить общих друзей
+     *
+     * @param userId   id пользователя
+     * @param friendId id друга
+     * @return возвращает набор общих друзей
+     */
+    Set<User> getCommonFriends(int userId, int friendId);
+
+    /**
+     * Получить всех друзей пользователя
+     *
+     * @param id
+     * @return возвращает список друзей пользователя
+     */
+    List<User> getAllUsersFriendsById(int id);
 }

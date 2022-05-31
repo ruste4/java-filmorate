@@ -24,6 +24,8 @@ public class Film {
     @NotNull
     private LocalDate releaseDate;
     @NotNull
+    private int rate;
+    @NotNull
     @EqualsAndHashCode.Exclude
     @JsonSerialize(using = DurationSerializer.class)
     private Duration duration;

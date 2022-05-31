@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.models;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Data
+@Builder
 public class User {
     @EqualsAndHashCode.Exclude
     private int id;
@@ -22,10 +24,6 @@ public class User {
     @EqualsAndHashCode.Exclude
     private LocalDate birthday;
     private Set<Integer> friendsId = new HashSet<>();
-
-    public Set<Integer> getAllFriendsId() {
-        return Collections.unmodifiableSet(friendsId);
-    }
 
     public void addNewFriend(int id) {
         friendsId.add(id);

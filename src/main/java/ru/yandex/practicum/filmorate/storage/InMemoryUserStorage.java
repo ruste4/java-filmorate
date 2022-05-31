@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
@@ -64,4 +62,56 @@ public class InMemoryUserStorage implements UserStorage {
 
         return user;
     }
+
+    @Override
+    public User addFriend(int userId, int friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+
+        user.addNewFriend(friendId);
+        friend.addNewFriend(userId);
+
+        return user;
+    }
+
+    @Override
+    public User deleteFriendToTheUser(int userId, int friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+
+        user.deleteFriend(friendId);
+        friend.deleteFriend(userId);
+
+        return user;
+    }
+
+    @Override
+    public Set<User> getCommonFriends(int userId, int friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+        Set<User> commonFriends = new HashSet<>();
+
+        for (int userFriendId : user.getFriendsId()) {
+            if (friend.getFriendsId().contains(userFriendId)) {
+                User commonFriend = findById(userFriendId);
+                commonFriends.add(commonFriend);
+            }
+        }
+        return commonFriends;
+    }
+
+    @Override
+    public List<User> getAllUsersFriendsById(int id) {
+        User user = findById(id);
+        Set<Integer> allFriendsId = user.getFriendsId();
+        List<User> friends = new ArrayList<>();
+
+        for (int friendId : allFriendsId) {
+            User friend = findById(friendId);
+            friends.add(friend);
+        }
+
+        return friends;
+    }
+
 }

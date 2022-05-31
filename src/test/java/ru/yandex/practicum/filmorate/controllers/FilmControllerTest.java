@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.models.Film;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 class FilmControllerTest {
     @Autowired
     private FilmController filmController;
@@ -104,10 +106,11 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("2022-01-01"));
         film.setDuration(Duration.ofMinutes(99));
 
-        User user = new User();
-        user.setEmail("AmadeusTverskoy462@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("AmadeusTverskoy462");
+        User user = User.builder()
+                .email("AmadeusTverskoy462@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("AmadeusTverskoy462")
+                .build();
 
         int filmId = filmController.addFilm(film).getId();
         int userId = userController.addUser(user).getId();
@@ -146,10 +149,11 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("2021-01-01"));
         film.setDuration(Duration.ofMinutes(99));
 
-        User user = new User();
-        user.setEmail("VeraDmitrieva330@mail.ru");
-        user.setBirthday(LocalDate.parse("1992-06-12"));
-        user.setLogin("VeraDmitrieva330");
+        User user = User.builder()
+                .email("VeraDmitrieva330@mail.ru")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .login("VeraDmitrieva330")
+                .build();
 
         int filmId = filmController.addFilm(film).getId();
         int userId = userController.addUser(user).getId();
