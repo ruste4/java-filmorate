@@ -151,6 +151,17 @@ public class UserDBStorage implements UserStorage {
     }
 
     @Override
+    public User confirmFriendship(int userId, int requestingUser) {
+        String sqlQuery = "UPDATE friendship\n" +
+                "SET accept = TRUE\n" +
+                "WHERE user_id = ? AND friend_id = ?;\n";
+
+        jdbcTemplate.update(sqlQuery, requestingUser, userId);
+
+        return findById(userId);
+    }
+
+    @Override
     public User deleteFriendToTheUser(int userId, int friendId) {
         String sqlQuery = "DELETE FROM friendship\n" +
                 "WHERE user_id = ?\n" +

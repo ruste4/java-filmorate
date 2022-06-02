@@ -64,6 +64,22 @@ public class UserController {
         return userService.addNewFriendToTheUser(userId, friendId);
     }
 
+    @PutMapping("{userId}/friends/request/{requestingUser}")
+    public User confirmFriendship(
+            @PathVariable(required = false) Integer userId,
+            @PathVariable(required = false) Integer requestingUser
+    ) {
+        if (userId == null) {
+            throw new IncorrectParameterException("userId");
+        }
+
+        if (requestingUser == null) {
+            throw new IncorrectParameterException("requestingUser");
+        }
+
+        return userService.confirmFriendship(userId, requestingUser);
+    }
+
     @DeleteMapping("{userId}/friends/{friendId}")
     public User deleteToFriends(
             @PathVariable(required = false) Integer userId,

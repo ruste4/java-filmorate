@@ -64,6 +64,15 @@ public interface UserStorage {
     User addFriend(int userId, int friendId);
 
     /**
+     * Подтвердить дружбу
+     *
+     * @param userId
+     * @param requestingUser
+     * @return пользователя, который подтвердил дружбу
+     */
+    User confirmFriendship(int userId, int requestingUser);
+
+    /**
      * Удалить друга у ползователя
      *
      * @param userId   id пользователя

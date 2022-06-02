@@ -74,6 +74,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User confirmFriendship(int userId, int requestingUser) {
+        throw new UnsupportedOperationException("InMemoryUserStorage.confirmFriendship() unsupported");
+    }
+
+    @Override
     public User deleteFriendToTheUser(int userId, int friendId) {
         User user = findById(userId);
         User friend = findById(friendId);

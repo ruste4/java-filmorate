@@ -64,6 +64,12 @@ public class UserService {
         return storage.addFriend(userId, friendId);
     }
 
+    public User confirmFriendship(int userId, int requestingUser) {
+        log.info("Confirm the friendship User:id={} one with User:id={}", userId, requestingUser);
+
+        return storage.confirmFriendship(userId, requestingUser);
+    }
+
     public User deleteFriendToTheUser(int userId, int friendId) {
         log.info("Delete User.id:{} from the friends list at User.id:{}", friendId, userId);
 
