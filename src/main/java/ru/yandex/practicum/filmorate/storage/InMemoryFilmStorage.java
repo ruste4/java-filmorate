@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
 import java.util.*;
@@ -19,7 +16,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static final AtomicInteger ID_HOLDER = new AtomicInteger();
 
     @Override
-    public Film add(Film film) throws FilmAlreadyExistException, ValidationException {
+    public Film add(Film film) {
         if (FILMS.containsValue(film)) {
             throw new FilmAlreadyExistException(
                     "Film " + film.getName() + " " + film.getReleaseDate() + " already exist"
@@ -33,7 +30,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteById(int id) throws FilmNotFoundException {
+    public Film deleteById(int id) {
         Film film = FILMS.remove(id);
         if (film == null) {
             throw new FilmNotFoundException("Film with id:" + id + " not found");
@@ -43,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) throws FilmNotFoundException, ValidationException {
+    public Film update(Film film) {
         if (!FILMS.containsKey(film.getId())) {
             throw new FilmNotFoundException("Film with id:" + film.getId() + " not found");
         }
@@ -59,7 +56,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findById(int id) throws FilmNotFoundException {
+    public Film findById(int id) {
         Film film = FILMS.get(id);
         if (film == null) {
             throw new FilmNotFoundException("Film with id:" + id + " not found");
@@ -69,7 +66,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+    public Film addLikeToFilm(int filmId, int userId) {
         Film film = findById(filmId);
         film.addLike(userId);
 
@@ -77,7 +74,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+    public Film deleteLikeToFilm(int filmId, int userId) {
         Film film = findById(filmId);
         film.deleteLike(userId);
 
@@ -85,7 +82,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Set<Integer> getAllLikes(int filmId) throws FilmNotFoundException, UserNotFoundException {
+    public Set<Integer> getAllLikes(int filmId) {
         Film film = findById(filmId);
 
         return film.getLikes();

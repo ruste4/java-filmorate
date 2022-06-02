@@ -28,7 +28,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film add(Film film) throws FilmAlreadyExistException, ValidationException {
+    public Film add(Film film) {
         FilmValidator.validate(film);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
@@ -51,7 +51,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteById(int id) throws FilmNotFoundException {
+    public Film deleteById(int id) {
         String sqlQuery = "DELETE FROM films\n" +
                 "WHERE film_id = ?";
 
@@ -66,7 +66,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) throws FilmNotFoundException, ValidationException {
+    public Film update(Film film) {
         FilmValidator.validate(film);
 
         String sqlQuery = "UPDATE films\n" +
@@ -107,7 +107,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film findById(int id) throws FilmNotFoundException {
+    public Film findById(int id) {
         String sqlQuery = "SELECT *\n" +
                 "FROM films\n" +
                 "WHERE film_id = ?;";
@@ -122,7 +122,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film addLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+    public Film addLikeToFilm(int filmId, int userId) {
         String sqlQuery = "INSERT INTO likes\n" +
                 "VALUES\n" +
                 "(?, ?);\n";
@@ -148,7 +148,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+    public Film deleteLikeToFilm(int filmId, int userId) {
         String sqlQuery = "DELETE FROM likes\n" +
                 "WHERE film_id = ? \n" +
                 "AND user_id = ?;\n";
@@ -164,7 +164,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Set<Integer> getAllLikes(int filmId) throws FilmNotFoundException {
+    public Set<Integer> getAllLikes(int filmId) {
         return findById(filmId).getLikes();
     }
 

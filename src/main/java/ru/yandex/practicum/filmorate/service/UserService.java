@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -24,25 +21,22 @@ public class UserService {
         this.storage = storage;
     }
 
-    public User addUser(User user) throws UserAlreadyExistException, ValidationException {
-        User newUser = storage.add(user);
+    public User addUser(User user) {
         log.info("Add {}", user);
 
-        return newUser;
+        return storage.add(user);
     }
 
-    public User deleteUser(int id) throws UserNotFoundException {
-        User user = storage.deleteById(id);
-        log.info("Delete {}", user);
+    public User deleteUser(int id) {
+        log.info("Delete user with id:{}", id);
 
-        return user;
+        return storage.deleteById(id);
     }
 
-    public User updateUser(User user) throws UserNotFoundException, ValidationException {
-        storage.update(user);
-        log.info("Update User.id:{} on {}", user.getId(), user);
+    public User updateUser(User user) {
+        log.info("Update with id:{} on {}", user.getId(), user);
 
-        return user;
+        return storage.update(user);
     }
 
     public Collection<User> getAllUsers() {
@@ -51,32 +45,32 @@ public class UserService {
         return storage.getAll();
     }
 
-    public User findUserById(int id) throws UserNotFoundException {
+    public User findUserById(int id) {
         User user = storage.findById(id);
         log.info("Find user by id:{}", id);
 
         return user;
     }
 
-    public List<User> getAllUsersFriendsById(int id) throws UserNotFoundException {
+    public List<User> getAllUsersFriendsById(int id) {
         log.info("Get all users friends by id:{}", id);
 
         return storage.getAllUsersFriendsById(id);
     }
 
-    public User addNewFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
-        log.info("Add new User.id:{} to the friends list at User.id:{}", friendId, userId);
+    public User addNewFriendToTheUser(int userId, int friendId) {
+        log.info("Add  User.id:{} to the friends list at User.id:{}", friendId, userId);
 
         return storage.addFriend(userId, friendId);
     }
 
-    public User deleteFriendToTheUser(int userId, int friendId) throws UserNotFoundException {
+    public User deleteFriendToTheUser(int userId, int friendId) {
         log.info("Delete User.id:{} from the friends list at User.id:{}", friendId, userId);
 
         return storage.deleteFriendToTheUser(userId, friendId);
     }
 
-    public Set<User> getCommonFriends(int userId, int friendId) throws UserNotFoundException {
+    public Set<User> getCommonFriends(int userId, int friendId) {
         log.info("Get common friends User.id:{} and User.id:{}", userId, friendId);
 
         return storage.getCommonFriends(userId, friendId);

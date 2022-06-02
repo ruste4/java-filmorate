@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.IncorrectParameterException;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -32,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable(required = false) Integer id) throws UserNotFoundException {
+    public User getUserById(@PathVariable(required = false) Integer id) {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }
@@ -41,19 +38,20 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) throws UserAlreadyExistException, ValidationException {
+    public User addUser(@Valid @RequestBody User user) {
         return userService.addUser(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) throws UserNotFoundException, ValidationException {
+    public User updateUser(@Valid @RequestBody User user) {
         return userService.updateUser(user);
     }
 
     @PutMapping("{userId}/friends/{friendId}")
     public User addToFriends(
             @PathVariable(required = false) Integer userId,
-            @PathVariable(required = false) Integer friendId) throws UserNotFoundException {
+            @PathVariable(required = false) Integer friendId
+    ) {
 
         if (userId == null) {
             throw new IncorrectParameterException("userId");
@@ -70,7 +68,7 @@ public class UserController {
     public User deleteToFriends(
             @PathVariable(required = false) Integer userId,
             @PathVariable(required = false) Integer friendId
-    ) throws UserNotFoundException {
+    ) {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }
@@ -83,7 +81,7 @@ public class UserController {
     }
 
     @GetMapping("{userId}/friends")
-    public List<User> getUsersFriends(@PathVariable(required = false) Integer userId) throws UserNotFoundException {
+    public List<User> getUsersFriends(@PathVariable(required = false) Integer userId) {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }
@@ -95,7 +93,7 @@ public class UserController {
     public Set<User> getCommonFriends(
             @PathVariable(required = false) Integer userId,
             @PathVariable(required = false) Integer friendId
-    ) throws UserNotFoundException {
+    ) {
         if (userId == null) {
             throw new IncorrectParameterException("userId");
         }

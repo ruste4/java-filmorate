@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -16,7 +15,7 @@ public class InMemoryUserStorage implements UserStorage {
     private static final AtomicInteger ID_HOLDER = new AtomicInteger();
 
     @Override
-    public User add(User user) throws UserAlreadyExistException, ValidationException {
+    public User add(User user) {
         if (USERS.containsValue(user)) {
             throw new UserAlreadyExistException("User with email:" + user.getEmail() + " already exist");
         }
@@ -28,7 +27,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User deleteById(int id) throws UserNotFoundException {
+    public User deleteById(int id) {
         User user = USERS.remove(id);
         if (user == null) {
             throw new UserNotFoundException("User with id:" + id + " not found");
@@ -38,7 +37,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) throws UserNotFoundException, ValidationException {
+    public User update(User user) {
         if (!USERS.containsKey(user.getId())) {
             throw new UserNotFoundException("User with:" + user.getId() + " not found");
         }
@@ -54,7 +53,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findById(int id) throws UserNotFoundException {
+    public User findById(int id) {
         User user = USERS.get(id);
         if (user == null) {
             throw new UserNotFoundException("User with id:" + id + " not found");

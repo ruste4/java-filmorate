@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.UserValidator;
 
@@ -30,7 +29,7 @@ public class UserDBStorage implements UserStorage {
     }
 
     @Override
-    public User add(User user) throws UserAlreadyExistException, ValidationException {
+    public User add(User user) {
         UserValidator.validate(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -45,6 +44,7 @@ public class UserDBStorage implements UserStorage {
         try {
             int user_id = simpleJdbcInsert.executeAndReturnKey(values).intValue();
             user.setId(user_id);
+            log.info("User id:{} added", user.getId());
 
             return user;
         } catch (DuplicateKeyException e) {
@@ -59,19 +59,21 @@ public class UserDBStorage implements UserStorage {
     }
 
     @Override
-    public User deleteById(int id) throws UserNotFoundException {
+    public User deleteById(int id) {
         User user = findById(id);
-
         String sqlQuery = "DELETE FROM users\n" +
                 "WHERE user_id = ?";
 
-        jdbcTemplate.update(sqlQuery, id);
-
+        int deleteResult = jdbcTemplate.update(sqlQuery, id);
+        if (deleteResult == 0) {
+            throw new UserNotFoundException("User with:" + id + " not found");
+        }
+        log.info("User with id:{} deleted", id);
         return user;
     }
 
     @Override
-    public User update(User user) throws UserNotFoundException, ValidationException {
+    public User update(User user) {
         UserValidator.validate(user);
 
         String sqlQuery = "UPDATE users\n" +
@@ -93,6 +95,7 @@ public class UserDBStorage implements UserStorage {
         if (updateResult == 0) {
             throw new UserNotFoundException("User with:" + user.getId() + " not found");
         }
+        log.info("User with id:{} updated", user.getId());
 
         return user;
     }
@@ -106,17 +109,20 @@ public class UserDBStorage implements UserStorage {
     }
 
     @Override
-    public User findById(int id) throws UserNotFoundException {
+    public User findById(int id) {
         String sqlQuery = "SELECT *\n" +
                 "FROM users\n" +
                 "WHERE user_id = ?;";
 
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+            log.info("User with id:{} found", id);
+
+            return user;
         } catch (IncorrectResultSizeDataAccessException e) {
             throw new UserNotFoundException("User with id:" + id + " not found");
-            //TODO  Не уверен в этом подходе, на сколько правильно это решение.
-            // стоит ли выбрасывает одно исключение при обработке другого, или нужно
+            //TODO  Не уверен в этом подходе. На сколько правильно это решение?
+            // Стоит ли выбрасывает одно исключение при обработке другого, или нужно
             // в ErrorHandler контроллере отдельно обрабатывать?
         }
 

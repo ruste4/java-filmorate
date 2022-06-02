@@ -46,8 +46,7 @@ public class FilmController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public Film addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId)
-            throws FilmNotFoundException, UserNotFoundException {
+    public Film addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }
@@ -60,7 +59,7 @@ public class FilmController {
     }
 
     @DeleteMapping("{id}/like/{userId}")
-    public Film deleteLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) throws FilmNotFoundException {
+    public Film deleteLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
         if (id == null) {
             throw new IncorrectParameterException("id");
         }

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.models;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,8 +39,7 @@ public class Film {
                 LocalDate releaseDate,
                 int rate, FilmMPA mpa,
                 int duration,
-                Set<Integer> likes)
-    {
+                Set<Integer> likes) {
         this.id = id;
         this.name = name;
         this.description = description;
