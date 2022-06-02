@@ -21,7 +21,7 @@ public class FilmValidator {
             throw new ValidationException("releaseDate", "должен быть не раньше 28 декабря 1895 года");
         }
 
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() < 0) {
             throw new ValidationException("duration", "должна быть положительной");
         }
     }

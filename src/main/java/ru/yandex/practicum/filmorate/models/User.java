@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Data
-@Builder
 public class User {
     @EqualsAndHashCode.Exclude
     private int id;
@@ -23,7 +22,22 @@ public class User {
     @Past
     @EqualsAndHashCode.Exclude
     private LocalDate birthday;
-    private Set<Integer> friendsId = new HashSet<>();
+    @EqualsAndHashCode.Exclude
+    private Set<Integer> friendsId;
+
+    @Builder
+    public User(int id, String email, String login, String name, LocalDate birthday, Set<Integer> friendsId) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friendsId = friendsId;
+
+        if (this.friendsId == null) {
+            this.friendsId = new HashSet<>();
+        }
+    }
 
     public void addNewFriend(int id) {
         friendsId.add(id);

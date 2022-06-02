@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,11 +13,13 @@ import ru.yandex.practicum.filmorate.models.User;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserControllerTest {
 
     @Autowired
@@ -35,7 +38,7 @@ class UserControllerTest {
                 .name("Ладимир")
                 .email("q61bldiyour-mai.xyz")
                 .birthday(LocalDate.parse("1973-06-12"))
-                .login("LadimirPodnebesnyy518")
+                .login("LadimirPodnebesnyy51822")
                 .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
@@ -71,6 +74,7 @@ class UserControllerTest {
                 .email("q61bldi1234@your-mai.xyz")
                 .birthday(LocalDate.parse("1973-06-12"))
                 .login("LadimirPodnebesnyy518")
+                .birthday(LocalDate.parse("1992-06-12"))
                 .build();
 
         userController.addUser(user);
@@ -83,7 +87,7 @@ class UserControllerTest {
         User user = User.builder()
                 .email("q61@your-mai.xyz")
                 .birthday(LocalDate.parse("2273-06-12"))
-                .login("LadimirPodnebesnyy518")
+                .login("LadimirPodnebesnyy8")
                 .build();
 
         assertThrows(ValidationException.class, () -> userController.addUser(user));
@@ -95,7 +99,7 @@ class UserControllerTest {
                 .id(Integer.MAX_VALUE)
                 .email("q61@your-mai.xyz")
                 .birthday(LocalDate.parse("1992-06-12"))
-                .login("LadimirPodnebesnyy518")
+                .login("44")
                 .build();
 
         assertThrows(UserNotFoundException.class, () -> userController.updateUser(user));
@@ -106,7 +110,7 @@ class UserControllerTest {
         User user = User.builder()
                 .email("q6lhkfe1@your-mai.xyz")
                 .birthday(LocalDate.parse("1992-06-12"))
-                .login("LadimirPodnebesnyy518")
+                .login("LadimirPodnebesnyy51821")
                 .build();
 
         assertThrows(UserAlreadyExistException.class, () -> {
@@ -133,7 +137,7 @@ class UserControllerTest {
         userController.addUser(friend);
         userController.addToFriends(user.getId(), friend.getId());
 
-        assertTrue(userController.getUserById(user.getId()).getFriendsId().contains(friend.getId()));
+        assertTrue(userController.getUsersFriends(user.getId()).contains(friend));
     }
 
     @Test
@@ -288,6 +292,8 @@ class UserControllerTest {
         userController.addToFriends(userId2, userId3);
         userController.addToFriends(userId1, userId3);
         userController.addToFriends(userId2, userId4);
+
+        Set<User> test = userController.getCommonFriends(userId1, userId2);
 
         assertTrue(userController.getCommonFriends(userId1, userId2).contains(user3));
     }

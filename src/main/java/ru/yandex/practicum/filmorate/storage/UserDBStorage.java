@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -40,11 +42,20 @@ public class UserDBStorage implements UserStorage {
         values.put("email", user.getEmail());
         values.put("birthday", user.getBirthday());
 
-        int user_id = simpleJdbcInsert.executeAndReturnKey(values).intValue();
+        try {
+            int user_id = simpleJdbcInsert.executeAndReturnKey(values).intValue();
+            user.setId(user_id);
 
-        user.setId(user_id);
-
-        return user;
+            return user;
+        } catch (DuplicateKeyException e) {
+            if (e.toString().contains("USERS(EMAIL)")) {
+                throw new UserAlreadyExistException("User with email:" + user.getEmail() + " already exist");
+            } else if (e.toString().contains("USERS(LOGIN)")) {
+                throw new UserAlreadyExistException("User with login:" + user.getLogin() + " already exist");
+            } else {
+                throw new UnsupportedOperationException(e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -101,11 +112,9 @@ public class UserDBStorage implements UserStorage {
                 "WHERE user_id = ?;";
 
         try {
-            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-
-            return user;
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
         } catch (IncorrectResultSizeDataAccessException e) {
-            throw new UserNotFoundException("User with:" + id + " not found");
+            throw new UserNotFoundException("User with id:" + id + " not found");
             //TODO  Не уверен в этом подходе, на сколько правильно это решение.
             // стоит ли выбрасывает одно исключение при обработке другого, или нужно
             // в ErrorHandler контроллере отдельно обрабатывать?
@@ -115,39 +124,39 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public User addFriend(int userId, int friendId) {
-        User user = findById(userId);
-        findById(friendId); // throw UserNotFoundException if user does not exist
         String sqlQuery = "INSERT INTO friendship (user_id, friend_id)\n" +
                 "VALUES\n" +
                 "(?, ?);";
 
-        jdbcTemplate.update(sqlQuery, userId, friendId);
+        try {
+            jdbcTemplate.update(sqlQuery, userId, friendId);
 
-        return user;
+            return findById(userId);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("FK_FRIENDSHIP_USER_ID")) {
+                throw new UserNotFoundException("User with id:" + userId + " not found");
+            } else if (e.getMessage().contains("FK_FRIENDSHIP_FRIEND_ID")) {
+                throw new UserNotFoundException("User with id:" + friendId + " not found");
+            } else {
+                throw new UnsupportedOperationException(e.getMessage());
+            }
+        }
+
     }
 
     @Override
     public User deleteFriendToTheUser(int userId, int friendId) {
-        User user = findById(userId);
-
         String sqlQuery = "DELETE FROM friendship\n" +
                 "WHERE user_id = ?\n" +
                 "     AND friend_id = ?;";
 
-        int deleteResult = jdbcTemplate.update(sqlQuery, userId, friendId);
+        jdbcTemplate.update(sqlQuery, userId, friendId);
 
-        if (deleteResult == 0) {
-            throw new UserNotFoundException("User with:" + friendId + " not found");
-        }
-
-        return user;
+        return findById(userId);
     }
 
     @Override
     public Set<User> getCommonFriends(int userId, int friendId) {
-        findById(userId);   // throw UserNotFoundException if user does not exist
-        findById(friendId);
-
         String sqlQuery = "SELECT *\n" +
                 "FROM (\n" +
                 "    SELECT u.user_id,\n" +

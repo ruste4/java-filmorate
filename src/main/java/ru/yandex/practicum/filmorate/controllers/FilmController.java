@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -17,12 +15,10 @@ import java.util.*;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-    private final UserService userService;
 
     @Autowired
-    public FilmController(FilmService filmService, UserService userService) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -31,17 +27,21 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film findFilmById(@PathVariable int id) throws FilmNotFoundException {
+    public Film findFilmById(@PathVariable Integer id) {
+        if (id == null) {
+            throw new IncorrectParameterException("id");
+        }
+
         return filmService.findFilmById(id);
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistException, ValidationException {
+    public Film addFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException, ValidationException {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         return filmService.updateFilm(film);
     }
 
@@ -56,16 +56,7 @@ public class FilmController {
             throw new IncorrectParameterException("userId");
         }
 
-        User user = userService.findUserById(userId);
-
-        if (user == null) {
-            throw new UserNotFoundException("User " + userId + " not found");
-        }
-
-        Film film = filmService.findFilmById(id);
-        film.addLike(userId);
-
-        return film;
+        return filmService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("{id}/like/{userId}")
@@ -78,16 +69,7 @@ public class FilmController {
             throw new IncorrectParameterException("userId");
         }
 
-        User user = userService.findUserById(userId);
-
-        if (user == null) {
-            throw new UserNotFoundException("User " + userId + " not found");
-        }
-
-        Film film = filmService.findFilmById(id);
-        film.deleteLike(userId);
-
-        return film;
+        return filmService.deleteLikeToFilm(id, userId);
     }
 
     @GetMapping("/popular")

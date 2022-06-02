@@ -3,14 +3,15 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.validators.FilmValidator;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -65,5 +66,36 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
 
         return film;
+    }
+
+    @Override
+    public Film addLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+        Film film = findById(filmId);
+        film.addLike(userId);
+
+        return film;
+    }
+
+    @Override
+    public Film deleteLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
+        Film film = findById(filmId);
+        film.deleteLike(userId);
+
+        return film;
+    }
+
+    @Override
+    public Set<Integer> getAllLikes(int filmId) throws FilmNotFoundException, UserNotFoundException {
+        Film film = findById(filmId);
+
+        return film.getLikes();
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        List<Film> films = new ArrayList<>(getAll());
+        films.sort(Comparator.comparing(Film::getLikeCount).reversed());
+
+        return films.stream().limit(count).collect(Collectors.toList());
     }
 }

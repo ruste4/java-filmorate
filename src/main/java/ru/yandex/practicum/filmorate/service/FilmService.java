@@ -33,24 +33,22 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) throws ValidationException, FilmAlreadyExistException {
-        Film newFilm = filmStorage.add(film);
         log.info("Add {}", film);
+        Film newFilm = filmStorage.add(film);
 
         return newFilm;
     }
 
     public Film deleteFilm(int id) throws FilmNotFoundException {
-        Film film = filmStorage.deleteById(id);
-        log.info("Delete {}", film);
+        log.info("Delete film with id:{}", id);
 
-        return film;
+        return filmStorage.deleteById(id);
     }
 
     public Film updateFilm(Film film) throws FilmNotFoundException, ValidationException {
-        filmStorage.update(film);
         log.info("Update Film.id:{} on {}", film.getId(), film);
 
-        return film;
+        return filmStorage.update(film);
     }
 
     public Collection<Film> getAllFilms() {
@@ -60,76 +58,34 @@ public class FilmService {
     }
 
     public Film findFilmById(int id) throws FilmNotFoundException {
-        Film film = filmStorage.findById(id);
-        log.info("Find film dy id:{}", id);
+        log.info("Find film with id:{}", id);
 
-        return film;
+        return filmStorage.findById(id);
     }
 
-    /**
-     * Добавить лайк фильму
-     *
-     * @param filmId id фильма
-     * @param userId id пользователя
-     * @return возвращает фильм с поставленным лайком
-     * @throws FilmNotFoundException если фильм не найден
-     */
     public Film addLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
-        Film film = filmStorage.findById(filmId);
-        film.addLike(userId);
         log.info("User.id:{} add like to Film.id:{}", userId, filmId);
 
-        return film;
+        return filmStorage.addLikeToFilm(filmId, userId);
     }
 
-    /**
-     * Удалить лайк у фильма
-     *
-     * @param filmId id фильма
-     * @param userId id пользователя
-     * @return возвращает фильм с удаленным лайком
-     * @throws FilmNotFoundException если фильм не найден
-     */
     public Film deleteLikeToFilm(int filmId, int userId) throws FilmNotFoundException {
-        Film film = filmStorage.findById(filmId);
-        film.deleteLike(userId);
         log.info("User.id:{} delete like to Film.id:{}", userId, filmId);
 
-        return film;
+        return filmStorage.deleteLikeToFilm(filmId, userId);
     }
 
-    /**
-     * Получить все лайки фильма
-     *
-     * @param filmId
-     * @return возвращает список пользователей, которые поставили лайк фильму
-     * @throws FilmNotFoundException если фильм не найден
-     * @throws UserNotFoundException если в списке лайков есть id несуществующего пользователя
-     */
     public List<User> getAllLikes(int filmId) throws FilmNotFoundException, UserNotFoundException {
-        Film film = filmStorage.findById(filmId);
-        List<User> userLikes = new ArrayList<>();
-
-        for (int userId : film.getLikes()) {
-            userLikes.add(userStorage.findById(userId));
-        }
         log.info("Get all likes of Film.id:{}", filmId);
+        Set<Integer> likes = filmStorage.getAllLikes(filmId);
 
-        return userLikes;
+        return likes.stream().map(userStorage::findById).collect(Collectors.toList());
     }
 
-    /**
-     * Получить популярные фильмы
-     *
-     * @param count количетсво фильмов
-     * @return возвращает отсортированный по количеству лайков список фильмов
-     */
     public List<Film> getPopularFilms(int count) {
-        List<Film> films = new ArrayList<>(filmStorage.getAll());
-        films.sort(Comparator.comparing(Film::getLikeCount).reversed());
         log.info("Get popular films");
 
-        return films.stream().limit(count).collect(Collectors.toList());
+        return filmStorage.getPopularFilms(count);
     }
 
 }

@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.FilmMPA;
 import ru.yandex.practicum.filmorate.models.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmControllerTest {
     @Autowired
     private FilmController filmController;
@@ -25,86 +27,82 @@ class FilmControllerTest {
     @Test
     public void shouldBeExceptionWithNameIsBlank() {
 
-        Film film = new Film();
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.parse("1967-03-25"));
-        film.setDuration(Duration.ofSeconds(100));
+        Film film = Film.builder()
+
+                .description("Description")
+                .releaseDate(LocalDate.parse("1967-03-25"))
+                .duration(100)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     public void shouldBeExceptionWithDescriptionLengthMore200Symbols() {
-        Film film = new Film();
-        film.setName("Звёздный путь");
-        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации, " +
-                "конкуренты Кирк и Спок должны объединиться, чтобы не дать ему разрушить все, что им дорого. " +
-                "Во время этого будоражащего путешествия, наполненного эффектными боями, юмором и космическими " +
-                "угрозами, новоиспеченные члены команды военного корабля «Энтерпрайз» смело встретятся лицом к лицу " +
-                "с невообразимыми опасностями.");
-        film.setReleaseDate(LocalDate.parse("1967-03-25"));
-        film.setDuration(Duration.ofSeconds(100));
+        Film film = Film.builder()
+                .name("Звёздный путь")
+                .description("Равным образом рамки и место обучения кадров влечет за собой процесс внедрения и " +
+                        "модернизации системы обучения кадров, соответствует насущным потребностям. Товарищи!" +
+                        " сложившаяся структура организации представляет собой интересный эксперимент проверки " +
+                        "направлений прогрессивного развития.")
+                .releaseDate(LocalDate.parse("1967-03-25"))
+                .duration(100)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     public void shouldBeExceptionWithReleaseDateBefore28December1895() {
-        Film film = new Film();
-        film.setName("Звёздный путь");
-        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
-        film.setReleaseDate(LocalDate.parse("1895-12-27"));
-        film.setDuration(Duration.ofSeconds(100));
+        Film film = Film.builder()
+                .name("Звёздный путь")
+                .description("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...")
+                .releaseDate(LocalDate.parse("1895-12-27"))
+                .duration(100)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     public void shouldBeExceptionWithDurationIsNegative() {
-        Film film = new Film();
-        film.setName("Звёздный путь");
-        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
-        film.setReleaseDate(LocalDate.parse("1967-03-25"));
-        film.setDuration(Duration.ofSeconds(-100));
+        Film film = Film.builder()
+                .name("Звёздный путь")
+                .description("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...")
+                .releaseDate(LocalDate.parse("1967-03-25"))
+                .duration(-100)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     public void shouldBeFilmNotFoundExceptionWithFilmNotAdded() {
-        Film film = new Film();
-        film.setName("Звёздный путь");
-        film.setDescription("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...");
-        film.setReleaseDate(LocalDate.parse("1967-03-25"));
-        film.setDuration(Duration.ofSeconds(100));
+        Film film = Film.builder()
+                .id(-1)
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .name("Звёздный путь")
+                .description("Когда Нерон с планеты Ромул приходит из будущего, чтобы отомстить Федерации...")
+                .releaseDate(LocalDate.parse("1967-03-25"))
+                .duration(100)
+                .build();
 
         assertThrows(FilmNotFoundException.class, () -> filmController.updateFilm(film));
     }
 
-    @Test
-    public void shouldBeFilmAlreadyExistExceptionWithIsAddedSecondTime() {
-        Film film = new Film();
-        film.setName("Звёздный крейсер «Галактика»");
-        film.setDescription("Чудом уцелев после нападения Сайлонов на колонии Кобола, гражданский колониал...");
-        film.setReleaseDate(LocalDate.parse("2004-03-16"));
-        film.setDuration(Duration.ofSeconds(100));
-
-        assertThrows(FilmAlreadyExistException.class, () -> {
-            filmController.addFilm(film);
-            filmController.addFilm(film);
-        });
-    }
 
     @Test
     public void shouldBeAddLikeToFilm()
             throws ValidationException, FilmAlreadyExistException, UserAlreadyExistException, FilmNotFoundException,
             UserNotFoundException {
 
-        Film film = new Film();
-        film.setName("Гарри Поттер 20 лет спустя: Возвращение в Хогвартс");
-        film.setDescription("Актеры великой франшизы встречаются в школе магии. Архивные кадры, ...");
-        film.setReleaseDate(LocalDate.parse("2022-01-01"));
-        film.setDuration(Duration.ofMinutes(99));
+        Film film = Film.builder()
+                .name("Гарри Поттер 20 лет спустя: Возвращение в Хогвартс")
+                .description("Актеры великой франшизы встречаются в школе магии. Архивные кадры, ...")
+                .releaseDate(LocalDate.parse("2022-01-01"))
+                .duration(99)
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .build();
 
         User user = User.builder()
                 .email("AmadeusTverskoy462@mail.ru")
@@ -135,7 +133,15 @@ class FilmControllerTest {
     @Test
     public void shouldBeUserNotFoundExceptionWhenUserNotFundByAddLikeToFilm() {
         assertThrows(UserNotFoundException.class, () -> {
-            filmController.addLikeToFilm(1, Integer.MAX_VALUE);
+            Film film = Film.builder()
+                    .name("Гарри Поттер 20 лет спустя: Возвращение в Хогвартс")
+                    .description("Актеры великой франшизы встречаются в школе магии. Архивные кадры, ...")
+                    .releaseDate(LocalDate.parse("2022-01-01"))
+                    .duration(99)
+                    .mpa(FilmMPA.builder().id(1).name("G").build())
+                    .build();
+            filmController.addFilm(film);
+            filmController.addLikeToFilm(film.getId(), Integer.MAX_VALUE);
         });
     }
 
@@ -143,11 +149,13 @@ class FilmControllerTest {
     public void shouldBeDeleteLikeToFilm()
             throws ValidationException, FilmAlreadyExistException, UserAlreadyExistException,
             FilmNotFoundException, UserNotFoundException {
-        Film film = new Film();
-        film.setName("Бука. Мое любимое чудище");
-        film.setDescription("Скандал в царском семействе: своенравная принцесса Варвара сбежала из дворца и...");
-        film.setReleaseDate(LocalDate.parse("2021-01-01"));
-        film.setDuration(Duration.ofMinutes(99));
+        Film film = Film.builder()
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .name("Бука. Мое любимое чудище")
+                .description("Скандал в царском семействе: своенравная принцесса Варвара сбежала из дворца и...")
+                .releaseDate(LocalDate.parse("2021-01-01"))
+                .duration(99)
+                .build();
 
         User user = User.builder()
                 .email("VeraDmitrieva330@mail.ru")
@@ -178,36 +186,66 @@ class FilmControllerTest {
     }
 
     @Test
-    public void shouldBeGet2FilmsWithCountParameter2() throws ValidationException, FilmAlreadyExistException {
-        Film film1 = new Film();
-        film1.setName("Film1");
-        film1.setDescription("Description");
-        film1.setReleaseDate(LocalDate.parse("2021-01-01"));
-        film1.setDuration(Duration.ofMinutes(99));
-        film1.addLike(1);
+    public void shouldBeGet2FilmsWithCountParameter2() {
+        Film film1 = Film.builder()
+                .name("Film1")
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .description("Description")
+                .releaseDate(LocalDate.parse("2021-01-01"))
+                .duration(99)
+                .build();
+
+        Film film2 = Film.builder()
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .name("Film2")
+                .description("Description")
+                .releaseDate(LocalDate.parse("2021-01-02"))
+                .duration(99)
+                .build();
+
+        Film film3 = Film.builder()
+                .mpa(FilmMPA.builder().id(1).name("G").build())
+                .name("Film3")
+                .description("Description")
+                .releaseDate(LocalDate.parse("2021-01-03"))
+                .duration(99)
+                .build();
+
+        User user1 = User.builder()
+                .email("user1@mail.ru").
+                login("user1")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .build();
+        User user2 = User.builder()
+                .email("user2@mail.ru")
+                .login("user2")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .build();
+        User user3 = User.builder().
+                email("user3@mail.ru")
+                .login("user3")
+                .birthday(LocalDate.parse("1992-06-12"))
+                .build();
+
+        userController.addUser(user1);
+        userController.addUser(user2);
+        userController.addUser(user3);
+
         filmController.addFilm(film1);
-
-        Film film2 = new Film();
-        film2.setName("Film2");
-        film2.setDescription("Description");
-        film2.setReleaseDate(LocalDate.parse("2021-01-02"));
-        film2.setDuration(Duration.ofMinutes(99));
-        film2.addLike(2);
-        film2.addLike(1);
         filmController.addFilm(film2);
-
-        Film film3 = new Film();
-        film3.setName("Film3");
-        film3.setDescription("Description");
-        film3.setReleaseDate(LocalDate.parse("2021-01-03"));
-        film3.setDuration(Duration.ofMinutes(99));
-        film3.addLike(1);
-        film3.addLike(2);
-        film3.addLike(3);
         filmController.addFilm(film3);
 
-        List<Film> checklist = List.of(film3, film2);
+        filmController.addLikeToFilm(film1.getId(), user1.getId());
 
-        assertEquals(filmController.getPopularFilms(2), checklist);
+        filmController.addLikeToFilm(film2.getId(), user1.getId());
+        filmController.addLikeToFilm(film2.getId(), user2.getId());
+
+        filmController.addLikeToFilm(film3.getId(), user1.getId());
+        filmController.addLikeToFilm(film3.getId(), user2.getId());
+        filmController.addLikeToFilm(film3.getId(), user3.getId());
+
+        List<Film> checklist = List.of(film3, film2);
+        List<Film> filmControllerResult = filmController.getPopularFilms(2);
+        assertEquals(filmControllerResult, checklist);
     }
 }
