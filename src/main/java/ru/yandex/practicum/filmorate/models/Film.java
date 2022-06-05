@@ -29,9 +29,18 @@ public class Film {
     private int duration;
     @EqualsAndHashCode.Exclude
     private Set<Integer> likes;
+    @EqualsAndHashCode.Exclude
+    private Set<Integer> genres;
 
     @Builder
-    public Film(int id, String name, String description, LocalDate releaseDate, FilmMPA mpa, int duration, Set<Integer> likes) {
+    public Film(
+            int id,
+            String name,
+            String description,
+            LocalDate releaseDate,
+            FilmMPA mpa, int duration,
+            Set<Integer> likes,
+            Set<Integer> genre) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -39,9 +48,14 @@ public class Film {
         this.mpa = mpa;
         this.duration = duration;
         this.likes = likes;
+        this.genres = genre;
 
         if (this.likes == null) {
             this.likes = new HashSet<>();
+        }
+
+        if (genres == null) {
+            this.genres = new HashSet<>();
         }
     }
 

@@ -20,12 +20,30 @@ import java.util.*;
 @Slf4j
 @Component("filmDBStorage")
 public class FilmDBStorage implements FilmStorage {
+    private static final String SQL_FOR_GET_FILM_GENRES_BY_ID = "SELECT g.genre_id FROM film_genre AS fg " +
+            "JOIN genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?";
+    private static final String SQL_QUERY_FOR_DELETE_BY_ID = "DELETE FROM films WHERE film_id = ?";
+    private static final String SQL_QUERY_FOR_UPDATE = "UPDATE films SET name = ?, mpa_id = ?, release_date  = ?, " +
+            "duration = ?, description = ? WHERE film_id = ?;";
+    private static final String SQL_QUERY_FOR_GET_ALL = "SELECT * FROM films;";
+    private static final String SQL_QUERY_FOR_FIND_BY_ID = "SELECT * FROM films WHERE film_id = ?;";
+    private static final String SQL_QUERY_FOR_ADD_LIKE_TO_FILM = "INSERT INTO likes VALUES (?, ?);";
+    private static final String SQL_QUERY_FOR_DELETE_LIKE_TO_FILM = "DELETE FROM likes WHERE film_id = ? AND " +
+            "user_id = ?;";
+    private static final String SQL_QUERY_FOR_GET_POPULAR_FILMS = "SELECT COUNT(l.film_id) AS film_count, f.film_id, " +
+            "f.name, f.mpa_id, f.release_date, f.duration, f.description FROM likes AS l RIGHT JOIN films AS f ON " +
+            "l.film_id = f.film_id GROUP BY f.film_id ORDER BY film_count DESC LIMIT ?;";
+    private static final String SQL_QUERY_FOR_GET_FILM_MPA_BY_ID = "SELECT * FROM mpa WHERE mpa_id = ?;";
+    private static final String SQL_QUERY_FOR_GET_FILM_LIKES_BY_ID = "SELECT user_id FROM likes WHERE film_id = ?;";
+
     private final JdbcTemplate jdbcTemplate;
+
 
     @Autowired
     public FilmDBStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
 
     @Override
     public Film add(Film film) {
@@ -51,10 +69,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film deleteById(int id) {
-        String sqlQuery = "DELETE FROM films\n" +
-                "WHERE film_id = ?";
-
-        int deleteResult = jdbcTemplate.update(sqlQuery, id);
+        int deleteResult = jdbcTemplate.update(SQL_QUERY_FOR_DELETE_BY_ID, id);
 
         if (deleteResult == 0) {
             throw new FilmNotFoundException("Film with id:" + id + " not found");
@@ -68,16 +83,8 @@ public class FilmDBStorage implements FilmStorage {
     public Film update(Film film) {
         FilmValidator.validate(film);
 
-        String sqlQuery = "UPDATE films\n" +
-                "SET name = ?,\n" +
-                "    mpa_id = ?,\n" +
-                "    release_date  = ?,\n" +
-                "    duration = ?,\n" +
-                "    description = ? \n" +
-                "WHERE film_id = ?;";
-
         int updatedResul = jdbcTemplate.update(
-                sqlQuery,
+                SQL_QUERY_FOR_UPDATE,
                 film.getName(),
                 film.getMpa().getId(),
                 film.getReleaseDate(),
@@ -97,19 +104,13 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getAll() {
-        String sqlQuery = "SELECT *\n" +
-                "FROM films;";
-
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        return jdbcTemplate.query(SQL_QUERY_FOR_GET_ALL, this::mapRowToFilm);
     }
 
     @Override
     public Film findById(int id) {
-        String sqlQuery = "SELECT *\n" +
-                "FROM films\n" +
-                "WHERE film_id = ?;";
         try {
-            Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+            Film film = jdbcTemplate.queryForObject(SQL_QUERY_FOR_FIND_BY_ID, this::mapRowToFilm, id);
             log.info("Film with id:{} found", id);
 
             return film;
@@ -120,12 +121,8 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film addLikeToFilm(int filmId, int userId) {
-        String sqlQuery = "INSERT INTO likes\n" +
-                "VALUES\n" +
-                "(?, ?);\n";
-
         try {
-            jdbcTemplate.update(sqlQuery, filmId, userId);
+            jdbcTemplate.update(SQL_QUERY_FOR_ADD_LIKE_TO_FILM, filmId, userId);
             return findById(filmId);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMostSpecificCause().getMessage();
@@ -146,11 +143,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film deleteLikeToFilm(int filmId, int userId) {
-        String sqlQuery = "DELETE FROM likes\n" +
-                "WHERE film_id = ? \n" +
-                "AND user_id = ?;\n";
-
-        int queryResult = jdbcTemplate.update(sqlQuery, filmId, userId);
+        int queryResult = jdbcTemplate.update(SQL_QUERY_FOR_DELETE_LIKE_TO_FILM, filmId, userId);
 
         if (queryResult == 0) {
             throw new LikeNotFoundException("Like by film:id=" + filmId + " from user:id=" + userId + " not found");
@@ -167,40 +160,25 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        String sqlQuery = "SELECT COUNT(l.film_id) AS film_count, \n" +
-                "    f.film_id, \n" +
-                "    f.name, \n" +
-                "    f.mpa_id, \n" +
-                "    f.release_date, \n" +
-                "    f.duration, \n" +
-                "    f.description\n" +
-                "FROM likes AS l\n" +
-                "RIGHT JOIN films AS f ON l.film_id = f.film_id\n" +
-                "GROUP BY f.film_id\n" +
-                "ORDER BY film_count DESC\n" +
-                "LIMIT ?;";
-
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        return jdbcTemplate.query(SQL_QUERY_FOR_GET_POPULAR_FILMS, this::mapRowToFilm, count);
     }
 
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
+        int filmId = rs.getInt("film_id");
         return Film.builder()
-                .id(rs.getInt("film_id"))
+                .id(filmId)
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .releaseDate(LocalDate.parse(rs.getString("release_date")))
                 .mpa(getFilmMPAById(rs.getInt("mpa_id")))
                 .duration(rs.getInt("duration"))
-                .likes(getFilmLikesById(rs.getInt("film_id")))
+                .likes(getFilmLikesById(filmId))
+                .genre(getFilmGenresById(filmId))
                 .build();
     }
 
     private FilmMPA getFilmMPAById(int id) {
-        String sqlQuery = "SELECT *\n" +
-                "FROM mpa\n" +
-                "WHERE mpa_id = ?;";
-
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilmMPA, id);
+        return jdbcTemplate.queryForObject(SQL_QUERY_FOR_GET_FILM_MPA_BY_ID, this::mapRowToFilmMPA, id);
     }
 
     private FilmMPA mapRowToFilmMPA(ResultSet rs, int rowNum) throws SQLException {
@@ -210,13 +188,18 @@ public class FilmDBStorage implements FilmStorage {
                 .build();
     }
 
-    private Set<Integer> getFilmLikesById(int id) {
-        String sqlQuery = "SELECT user_id \n" +
-                "FROM likes\n" +
-                "WHERE film_id = ?;";
-
+    private Set<Integer> getFilmGenresById(int id) {
         List<Integer> queryResult = jdbcTemplate.query(
-                sqlQuery,
+                SQL_FOR_GET_FILM_GENRES_BY_ID,
+                (ResultSet rs, int rowNum) -> rs.getInt("genre_id"),
+                id);
+
+        return Set.copyOf(queryResult);
+    }
+
+    private Set<Integer> getFilmLikesById(int id) {
+        List<Integer> queryResult = jdbcTemplate.query(
+                SQL_QUERY_FOR_GET_FILM_LIKES_BY_ID,
                 (ResultSet rs, int rowNum) -> rs.getInt("user_id"),
                 id);
 
