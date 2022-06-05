@@ -37,7 +37,6 @@ public class FilmDBStorage implements FilmStorage {
         Map<String, Object> values = new HashMap<>();
         values.put("name", film.getName());
         values.put("mpa_id", film.getMpa().getId());
-        values.put("rate", film.getRate());
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
         values.put("description", film.getDescription());
@@ -74,8 +73,7 @@ public class FilmDBStorage implements FilmStorage {
                 "    mpa_id = ?,\n" +
                 "    release_date  = ?,\n" +
                 "    duration = ?,\n" +
-                "    description = ?,\n" +
-                "    rate = ?\n" +
+                "    description = ? \n" +
                 "WHERE film_id = ?;";
 
         int updatedResul = jdbcTemplate.update(
@@ -85,7 +83,6 @@ public class FilmDBStorage implements FilmStorage {
                 film.getReleaseDate(),
                 film.getDuration(),
                 film.getDescription(),
-                film.getRate(),
                 film.getId()
         );
 
@@ -173,7 +170,6 @@ public class FilmDBStorage implements FilmStorage {
         String sqlQuery = "SELECT COUNT(l.film_id) AS film_count, \n" +
                 "    f.film_id, \n" +
                 "    f.name, \n" +
-                "    f.rate,  \n" +
                 "    f.mpa_id, \n" +
                 "    f.release_date, \n" +
                 "    f.duration, \n" +
@@ -193,7 +189,6 @@ public class FilmDBStorage implements FilmStorage {
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .releaseDate(LocalDate.parse(rs.getString("release_date")))
-                .rate(rs.getInt("rate"))
                 .mpa(getFilmMPAById(rs.getInt("mpa_id")))
                 .duration(rs.getInt("duration"))
                 .likes(getFilmLikesById(rs.getInt("film_id")))

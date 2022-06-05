@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS films (
     film_id int   NOT NULL AUTO_INCREMENT,
     name varchar(255)   NOT NULL,
-    rate int,
     mpa_id int   NOT NULL,
     release_date date   NOT NULL,
     duration int   NOT NULL,

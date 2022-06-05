@@ -23,8 +23,6 @@ public class Film {
     @NotNull
     private LocalDate releaseDate;
     @NotNull
-    private int rate;
-    @NotNull
     private FilmMPA mpa;
     @NotNull
     @EqualsAndHashCode.Exclude
@@ -33,18 +31,11 @@ public class Film {
     private Set<Integer> likes;
 
     @Builder
-    public Film(int id,
-                String name,
-                String description,
-                LocalDate releaseDate,
-                int rate, FilmMPA mpa,
-                int duration,
-                Set<Integer> likes) {
+    public Film(int id, String name, String description, LocalDate releaseDate, FilmMPA mpa, int duration, Set<Integer> likes) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
-        this.rate = rate;
         this.mpa = mpa;
         this.duration = duration;
         this.likes = likes;
