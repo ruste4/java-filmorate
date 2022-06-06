@@ -35,9 +35,12 @@ public class FilmDBStorage implements FilmStorage {
             "l.film_id = f.film_id GROUP BY f.film_id ORDER BY film_count DESC LIMIT ?;";
     private static final String SQL_QUERY_FOR_GET_FILM_MPA_BY_ID = "SELECT * FROM mpa WHERE mpa_id = ?;";
     private static final String SQL_QUERY_FOR_GET_FILM_LIKES_BY_ID = "SELECT user_id FROM likes WHERE film_id = ?;";
+    private static final String SQL_QUERY_FOR_ADD_FILM_GENRE_BY_ID = "INSERT INTO film_genre (film_id, genre_id) " +
+            "VALUE (?, ?)";
+    private static final String SQL_QUERY_FOR_DELETE_FILM_GENRE_BY_ID = "DELETE FROM film_genre WHERE film_id = ? " +
+            "AND genre_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
-
 
     @Autowired
     public FilmDBStorage(JdbcTemplate jdbcTemplate) {
@@ -195,6 +198,18 @@ public class FilmDBStorage implements FilmStorage {
                 id);
 
         return Set.copyOf(queryResult);
+    }
+
+    private Set<Integer> addFilmGenreById(int filmId, int genreId) {
+        int queryResult = jdbcTemplate.update(SQL_QUERY_FOR_ADD_FILM_GENRE_BY_ID, filmId, genreId);
+
+        return getFilmGenresById(filmId);
+    }
+
+    private Set<Integer> deleteFilmGenreById(int filmId, int genreId) {
+        int queryResult = jdbcTemplate.update(SQL_QUERY_FOR_DELETE_FILM_GENRE_BY_ID, filmId, genreId);
+
+        return getFilmGenresById(filmId);
     }
 
     private Set<Integer> getFilmLikesById(int id) {
